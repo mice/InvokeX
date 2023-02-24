@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<engine:UXML
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:engine="UnityEngine.UIElements"
+    xmlns:editor="UnityEditor.UIElements"
+    xsi:noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd"
+>
+    <engine:VisualElement name="tabContainer">
+        <Style src="UIRuntimeCall.uss" />
+        <engine:Button text="开放界面" name="btn_show_levelUp" style="height: 32px; -unity-text-align: upper-center; align-items: center; justify-content: center;" />
+        <engine:VisualElement name="tabs" style="flex-direction: row; flex-grow: 0; flex-shrink: 0; flex-basis: 32px; height: 32px; justify-content: flex-start;">
+            <engine:Button name="GMTab" text="GM" class="tab currentlySelectedTab" />
+            <engine:Button name="ParisTab" text="Paris" class="tab" />
+        </engine:VisualElement>
+        <engine:VisualElement name="tabContent" style="flex-grow: 1; flex-shrink: 0;">
+            <engine:VisualElement name="GMContent" style="flex-grow: 1; flex-shrink: 0; flex-basis: 100%; height: 100%;" />
+            <engine:Label text="Paris is the capital of France" name="ParisContent" class="unselectedContent" />
+        </engine:VisualElement>
+    </engine:VisualElement>
+    <engine:ScrollView name="typeContainer">
+    </engine:ScrollView>
+</engine:UXML>

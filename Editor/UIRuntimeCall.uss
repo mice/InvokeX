@@ -1,0 +1,84 @@
+Label {
+    font-size: 20px;
+    -unity-font-style: bold;
+    color: rgb(68, 138, 255);
+}
+
+
+#btn_show_levelUp
+{
+    height:32px;
+}
+
+#tabContainer
+{
+    flex-direction:column;
+    flex-wrap:nowrap;
+    align-content:stretch;
+    flex-grow: 1;
+    flex-shrink: 0;
+    height: auto;
+}
+
+/* Style for tabs */
+#tabs {
+    flex-basis: 10%;
+    background-color: rgb(229, 223, 223);
+    -unity-font-style: bold;
+    font-size: 14px;
+    flex-direction:row;
+    flex-wrap:nowrap;
+    align-items:center;
+    align-content:stretch;
+    justify-content:center;
+    width:100%;
+    height:32px;
+}
+
+/* Sets each label in tabs to have the same size. */
+.tab {
+    flex-grow: 1;
+    width:60px;
+    height:32px;
+}
+
+/* Adds background color for the selected tab */
+.currentlySelectedTab {
+    background-color: rgb(173, 166, 166);
+}
+
+/* Style for tabContent */
+#tabContent {
+    /*  flex-basis: 90%; */
+    background-color: rgb(255, 255, 255);
+    font-size: 20px;
+    width:100%;
+    height:400px;
+    flex-grow:1;
+}
+
+.tabContent {
+    width:100%;
+    height:100%;
+}
+
+/* Hides the unselected tab content */
+.unselectedContent {
+    display: none;
+}
+
+#typeContainer{
+    width:100%;
+    height:240px;
+}
+
+.TabContainerListView{
+    --unity-item-height: 32px;
+    flex-grow:1;
+    width:100%;
+    background-color:rgb(255,255,255);
+}
+
+.gmitem{
+    width :100%;
+}
