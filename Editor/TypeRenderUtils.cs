@@ -15,7 +15,6 @@ public static partial class TypeRenderUtils
         TypeElementRenderer.factory = factory;
     }
 
-
     public static void RenderParams(ScrollView selectItemViews, ParameterInfo[] parameterInfos,string methodName = "UnNamed")
     {
         selectItemViews.Clear();

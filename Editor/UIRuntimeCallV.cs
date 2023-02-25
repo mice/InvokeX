@@ -24,7 +24,7 @@ public class UIRuntimeCallV : EditorWindow
 
     private TabbedMenuController menuController;
     private StyleSheet styleSheet;
-    private Dictionary<string, Type> typeDict = new Dictionary<string, Type>();
+   
 
     public void CreateGUI()
     {
@@ -52,15 +52,8 @@ public class UIRuntimeCallV : EditorWindow
         root.styleSheets.Add(styleSheet);
     }
 
-    private void _CreateTabs(VisualElement root)
+    private void _CreateTabs(VisualElement root, List<string> tabs , List<bool> tabType)
     {
-        var tabs = new List<string>();
-
-        tabs.Clear();
-        tabs.AddRange(typeDict.Keys);
-        tabs.Add("TestLog");
-        tabs.Add("DLog");
-
         var tabsContainer = root.Q<VisualElement>("tabs");
         var tabContentContainer = root.Q<VisualElement>("tabContent");
         tabsContainer.Clear();
@@ -69,11 +62,17 @@ public class UIRuntimeCallV : EditorWindow
         InitTab(tabs, tabsContainer, tabContentContainer);
         menuController = new TabbedMenuController(root);
         menuController.RegisterTabCallbacks();
-        new ContainerData<MethodCLR>(styleSheet, OnSelectItem).InitContainer(root, nameof(GMScripts), GetT);
-        new ContainerData<MethodCLR>(styleSheet, OnSelectItem).InitContainer(root, nameof(ProtocalX), GetT);
-        new ContainerData<MethodCLR>(styleSheet, OnSelectItem).InitContainer(root, nameof(ViewUtils), GetT);
-        new ContainerData<MethodIL>(styleSheet, OnSelectItem).InitContainer(root, "TestLog", GetY);
-        new ContainerData<MethodIL>(styleSheet, OnSelectItem).InitContainer(root, "DLog", GetY);
+        for (int i = 0; i < tabType.Count; i++)
+        {
+            if (tabType[i])
+            {
+                new ContainerData<MethodCLR>(styleSheet, OnSelectItem).InitContainer(root, tabs[i], GetCLR);
+            }
+            else
+            {
+                new ContainerData<MethodIL>(styleSheet, OnSelectItem).InitContainer(root, tabs[i], GetIL);
+            }
+        }
     }
 
     private void _CreateUI(VisualElement root)
@@ -87,12 +86,22 @@ public class UIRuntimeCallV : EditorWindow
         {
             UnityEngine.Debug.LogError(exce.ToString());
         }
+        var callDataProvider = new CallDataProvider();
 
         try
         {
             var btn_show_levelUp = root.Q<Button>("btn_show_levelUp");
             if (btn_show_levelUp != null)
-                btn_show_levelUp.clicked += _showTextLevelUp;
+                btn_show_levelUp.clicked += callDataProvider.ShowTextLevelUp;
+        }
+        catch (Exception exce)
+        {
+            UnityEngine.Debug.LogError(exce.ToString());
+        }
+       
+        try
+        {
+            callDataProvider.InitData();
         }
         catch (Exception exce)
         {
@@ -101,17 +110,10 @@ public class UIRuntimeCallV : EditorWindow
 
         try
         {
-            InitTypes();
-            InitILCall();
-        }
-        catch (Exception exce)
-        {
-            UnityEngine.Debug.LogError(exce.ToString());
-        }
-
-        try
-        {
-            _CreateTabs(root);
+            var tabs = new List<string>();
+            var tabTypes = new List<bool>();
+            callDataProvider.CreateTabs(tabs,tabTypes);
+            _CreateTabs(root, tabs, tabTypes);
         }
         catch (Exception exce)
         {
@@ -119,32 +121,7 @@ public class UIRuntimeCallV : EditorWindow
         }
     }
 
-    private void InitILCall()
-    {
-        var appMain = GameObject.FindObjectOfType<AppMain>();
-        if (appMain == null || appMain.ilRuntime == null)
-            return;
-        
-        var appdomain = appMain.ilRuntime.AppDomain;
-        var mgr = ILRuntimeCallManager.Instance;
-        if (appdomain != null)
-        {
-            mgr.SetDomain(appdomain);
-        }
-
-        if(appdomain.LoadedTypes.TryGetValue("TestLog",out var ilType))
-        {
-            var logInstance = appdomain.Instantiate("TestLog");
-            mgr.AddInstance("TestLog", logInstance);
-        }
-
-        if (appdomain.LoadedTypes.TryGetValue("DLog", out var ilType2))
-        {
-            mgr.AddStatic((ILRuntime.CLR.TypeSystem.ILType)ilType2);
-        }
-    }
-
-    private void GetT(string tab, List<MethodCLR> list)
+    private void GetCLR(string tab, List<MethodCLR> list)
     {
         var targetMgr = RuntimeCallManager.Instance;
         var methodTable = new Dictionary<string, System.Reflection.MethodBase>();
@@ -155,7 +132,7 @@ public class UIRuntimeCallV : EditorWindow
         }
     }
 
-    private void GetY(string tab, List<MethodIL> list)
+    private void GetIL(string tab, List<MethodIL> list)
     {
         if (!Application.isPlaying)
             return;
@@ -180,7 +157,7 @@ public class UIRuntimeCallV : EditorWindow
                 TypeRenderUtils.RenderMethod(scrollView, method);
                 var button = new Button();
                 button.text = "确认";
-                button.clicked += () => OnClickSubmit(tab,target);
+                button.clicked += () => OnClickSubmit(tab, method);
                 scrollView.Insert(0, button);
             }
         }else if(target is MethodIL methodYYY)
@@ -195,41 +172,38 @@ public class UIRuntimeCallV : EditorWindow
              
                 var button = new Button();
                 button.text = "确认";
-                button.clicked += () => OnClickSubmit(tab, target);
+                button.clicked += () => OnClickSubmit(tab, methodYYY);
                 scrollView.Insert(0, button);
             }
         }
     }
 
-    private void OnClickSubmit(string sub,System.Object target)
+    private void OnClickSubmit(string sub, IMethodInfoData target)
     {
         try
         {
-            if (target is MethodCLR method)
+            var scrollView = rootVisualElement.Q<ScrollView>("typeContainer");
+            if (scrollView != null && scrollView.userData is ParamRendererContainer renderContainer)
             {
-                var scrollView = rootVisualElement.Q<ScrollView>("typeContainer");
-                if (scrollView != null)
+                object[] arr;
+                if (target.ParamCount == 0)
                 {
-                    if (scrollView.userData is ParamRendererContainer renderContainer)
-                    {
-                        var arr = new object[method.ParamCount];
-                        renderContainer.MakeParams(arr);
-                        RuntimeCallManager.Instance.Invoke(sub, method.Name, arr);
-                    }
+                    arr = Array.Empty<object>();
                 }
-            }
-            else if (target is MethodIL methodYYY)
-            {
-                var scrollView = rootVisualElement.Q<ScrollView>("typeContainer");
-                if (scrollView != null)
+                else
                 {
-                    if (scrollView.userData is ParamRendererContainer renderContainer)
-                    {
-                        var arr = new object[methodYYY.ParamCount];
-                        renderContainer.MakeParams(arr);
-                        var mgr = ILRuntimeCallManager.Instance;
-                        mgr.Invoke(sub, methodYYY.Name, arr);
-                    }
+                    arr = new object[target.ParamCount];
+                    renderContainer.MakeParams(arr);
+                }
+              
+                if (target is MethodCLR method)
+                {
+                    RuntimeCallManager.Instance.Invoke(sub, method.Name, arr);
+                }
+                else if (target is MethodIL methodYYY)
+                {
+                    var mgr = ILRuntimeCallManager.Instance;
+                    mgr.Invoke(sub, methodYYY.Name, arr);
                 }
             }
         }catch(Exception exce)
@@ -259,31 +233,6 @@ public class UIRuntimeCallV : EditorWindow
             cont.AddToClassList(i == 0 ? "selectedContent" : "unselectedContent");
             tabContentContainer.Add(cont);
         }
-    }
-
-    private void InitTypes()
-    {
-        var targetMgr = RuntimeCallManager.Instance;
-        targetMgr.AddInstance(nameof(GMScripts), new GMScripts());
-        targetMgr.AddInstance(nameof(ProtocalX), new ProtocalX());
-        targetMgr.AddStatic(typeof(ViewUtils));
-        targetMgr.GetTypeDictionary(typeDict);
-    }
-
-    private void _showTextLevelUp()
-    {
-        if (!Application.isPlaying)
-            return;
-        //var appdomain = QKILRuntimeEngine.Instance.Appdomain;
-
-        //ILRuntime.CLR.TypeSystem.IType t = appdomain.LoadedTypes["ViewUtils"];
-        //Type type = t.ReflectionType;
-       
-        //if (type!=null)
-        //{
-        //    appdomain.Invoke("ViewUtils", "ShowLvUp", null);
-        //    //appdomain.Invoke("ViewUtils", "ShowFunctionOpen", null);
-        //}
     }
 }
 
