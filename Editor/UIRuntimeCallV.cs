@@ -7,9 +7,14 @@ using System.Collections.Generic;
 using System.Reflection;
 using ILRuntime.CLR.Method;
 
+public static class UIRuntimeSetting
+{
+    public static string Fold = "Assets/Scripts/RuntimeCall/Editor/";
+}
+
 public class UIRuntimeCallV : EditorWindow
 {
-    static string Fold = "Assets/Scripts/RuntimeCall/Editor/";
+    
     [MenuItem("Window/UIElements/UIRuntimeCallX")]
     public static void ShowExample()
     {
@@ -37,13 +42,13 @@ public class UIRuntimeCallV : EditorWindow
 
     private void _LoadULLAndUSS(VisualElement root)
     {
-        var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(System.IO.Path.Combine(Fold, "UIRuntimeCall.uxml"));
+        var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(System.IO.Path.Combine(UIRuntimeSetting.Fold, "UIRuntimeCall.uxml"));
         VisualElement labelFromUXML = visualTree.CloneTree();
         root.Add(labelFromUXML);
 
         // A stylesheet can be added to a VisualElement.
         // The style will be applied to the VisualElement and all of its children.
-        styleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>(System.IO.Path.Combine(Fold, "UIRuntimeCall.uss"));
+        styleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>(System.IO.Path.Combine(UIRuntimeSetting.Fold, "UIRuntimeCall.uss"));
         root.styleSheets.Add(styleSheet);
     }
 
@@ -64,11 +69,11 @@ public class UIRuntimeCallV : EditorWindow
         InitTab(tabs, tabsContainer, tabContentContainer);
         menuController = new TabbedMenuController(root);
         menuController.RegisterTabCallbacks();
-        new ContainerData<MethodTTT>(styleSheet, OnSelectItem).InitContainer(root, nameof(GMScripts), GetT);
-        new ContainerData<MethodTTT>(styleSheet, OnSelectItem).InitContainer(root, nameof(ProtocalX), GetT);
-        new ContainerData<MethodTTT>(styleSheet, OnSelectItem).InitContainer(root, nameof(ViewUtils), GetT);
-        new ContainerData<MethodYYY>(styleSheet, OnSelectItem).InitContainer(root, "TestLog", GetY);
-        new ContainerData<MethodYYY>(styleSheet, OnSelectItem).InitContainer(root, "DLog", GetY);
+        new ContainerData<MethodCLR>(styleSheet, OnSelectItem).InitContainer(root, nameof(GMScripts), GetT);
+        new ContainerData<MethodCLR>(styleSheet, OnSelectItem).InitContainer(root, nameof(ProtocalX), GetT);
+        new ContainerData<MethodCLR>(styleSheet, OnSelectItem).InitContainer(root, nameof(ViewUtils), GetT);
+        new ContainerData<MethodIL>(styleSheet, OnSelectItem).InitContainer(root, "TestLog", GetY);
+        new ContainerData<MethodIL>(styleSheet, OnSelectItem).InitContainer(root, "DLog", GetY);
     }
 
     private void _CreateUI(VisualElement root)
@@ -139,18 +144,18 @@ public class UIRuntimeCallV : EditorWindow
         }
     }
 
-    private void GetT(string tab, List<MethodTTT> list)
+    private void GetT(string tab, List<MethodCLR> list)
     {
         var targetMgr = RuntimeCallManager.Instance;
         var methodTable = new Dictionary<string, System.Reflection.MethodBase>();
         targetMgr.GetMethodDictionary(tab, methodTable);
         foreach(var item in methodTable.Values)
         {
-            list.Add(new MethodTTT(item));
+            list.Add(new MethodCLR(item));
         }
     }
 
-    private void GetY(string tab, List<MethodYYY> list)
+    private void GetY(string tab, List<MethodIL> list)
     {
         if (!Application.isPlaying)
             return;
@@ -161,29 +166,33 @@ public class UIRuntimeCallV : EditorWindow
 
         foreach(var method in methodTable)
         {
-            list.Add(new MethodYYY(method.Value));
+            list.Add(new MethodIL(method.Value));
         }
     }
 
     private void OnSelectItem(string tab,System.Object target)
     {
-        if(target is MethodTTT method)
+        if(target is MethodCLR method)
         {
             var scrollView = rootVisualElement.Q<ScrollView>("typeContainer");
             if (scrollView != null)
             {
-                TypeRenderUtils.RenderParams(scrollView, method.GetParameters());
+                TypeRenderUtils.RenderMethod(scrollView, method);
                 var button = new Button();
                 button.text = "确认";
                 button.clicked += () => OnClickSubmit(tab,target);
                 scrollView.Insert(0, button);
             }
-        }else if(target is MethodYYY methodYYY)
+        }else if(target is MethodIL methodYYY)
         {
             var scrollView = rootVisualElement.Q<ScrollView>("typeContainer");
             if (scrollView != null)
             {
-                TypeRenderUtils.RenderParams(scrollView, methodYYY.Data.Parameters);
+                if (methodYYY.ParamCount > 0)
+                {
+                    TypeRenderUtils.RenderILParams(scrollView, methodYYY.Data.Parameters);
+                }
+             
                 var button = new Button();
                 button.text = "确认";
                 button.clicked += () => OnClickSubmit(tab, target);
@@ -196,27 +205,31 @@ public class UIRuntimeCallV : EditorWindow
     {
         try
         {
-            if (target is MethodTTT method)
+            if (target is MethodCLR method)
             {
                 var scrollView = rootVisualElement.Q<ScrollView>("typeContainer");
                 if (scrollView != null)
                 {
-                    UnityEngine.Debug.LogError($"Call:{method}");
-                    var arr = new object[method.ParamCount];
-                    TypeRenderUtils.MakeParams(scrollView, arr);
-                    RuntimeCallManager.Instance.Invoke(sub, method.Name, arr);
+                    if (scrollView.userData is ParamRendererContainer renderContainer)
+                    {
+                        var arr = new object[method.ParamCount];
+                        renderContainer.MakeParams(arr);
+                        RuntimeCallManager.Instance.Invoke(sub, method.Name, arr);
+                    }
                 }
             }
-            else if (target is MethodYYY methodYYY)
+            else if (target is MethodIL methodYYY)
             {
                 var scrollView = rootVisualElement.Q<ScrollView>("typeContainer");
                 if (scrollView != null)
                 {
-                    UnityEngine.Debug.LogError($"Call:{methodYYY}");
-                    var mgr = ILRuntimeCallManager.Instance;
-                    var arr = new object[methodYYY.ParamCount];
-                    TypeRenderUtils.MakeParams(scrollView, arr);
-                    mgr.Invoke(sub, methodYYY.Name, arr);
+                    if (scrollView.userData is ParamRendererContainer renderContainer)
+                    {
+                        var arr = new object[methodYYY.ParamCount];
+                        renderContainer.MakeParams(arr);
+                        var mgr = ILRuntimeCallManager.Instance;
+                        mgr.Invoke(sub, methodYYY.Name, arr);
+                    }
                 }
             }
         }catch(Exception exce)
@@ -282,12 +295,13 @@ public interface IMethodInfoData
     ParameterInfo[] GetParameters();
 }
 
-public class MethodTTT : IMethodInfoData
+public class MethodCLR : IMethodInfoData
 {
     public string Name => Data.Name;
     public int ParamCount { get; private set; }
     public MethodBase Data;
-    public MethodTTT(MethodBase method) {
+
+    public MethodCLR(MethodBase method) {
         this.Data = method;
         this.ParamCount = method.GetParameters().Length;
     }
@@ -298,13 +312,13 @@ public class MethodTTT : IMethodInfoData
     }
 }
 
-public class MethodYYY : IMethodInfoData
+public class MethodIL : IMethodInfoData
 {
     public string Name => Data.Name;
     public int ParamCount { get; private set; }
     public IMethod Data;
    
-    public MethodYYY(IMethod method)
+    public MethodIL(IMethod method)
     {
         this.Data = method;
         this.ParamCount = method.ParameterCount;
@@ -352,7 +366,7 @@ public class ContainerData<T>
 
     private VisualElement _MakeItem()
     {
-        var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/Scripts/Editor/MethodItemCell.uxml");
+        var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(UIRuntimeSetting.Fold + "MethodItemCell.uxml");
         VisualElement labelFromUXML = visualTree.CloneTree();
         labelFromUXML.AddToClassList("gmitem");
         if (styleSheet != null)
@@ -385,12 +399,12 @@ public class ContainerData<T>
         var index = System.Convert.ToInt32(((VisualElement)(e.currentTarget)).userData);
         if (index < list.Count)
         {
-            if(typeof(T) == typeof(MethodTTT))
+            if(typeof(T) == typeof(MethodCLR))
             {
                 var targetMgr = RuntimeCallManager.Instance;
                 targetMgr.Invoke(tab, list[index].Name, Array.Empty<object>());
             }
-            else if(typeof(T)== typeof(MethodYYY))
+            else if(typeof(T)== typeof(MethodIL))
             {
                 var mgr = ILRuntimeCallManager.Instance;
                 mgr.Invoke(tab, list[index].Name);

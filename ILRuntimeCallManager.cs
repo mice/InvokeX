@@ -72,6 +72,7 @@ public class ILRuntimeCallManager
     public static ILRuntimeCallManager Instance { get; } = new ILRuntimeCallManager();
     private static Dictionary<string, (ILType, System.Object)> targetCallDict = new Dictionary<string, (ILType, System.Object)>();
     private static Dictionary<ILType, RuntimeMethodTable> typeMethodDict = new Dictionary<ILType, RuntimeMethodTable>();
+    public static AppDomain AppDomain => appDomain;
     private static AppDomain appDomain;
     public void SetDomain(AppDomain appDomain_)
     {

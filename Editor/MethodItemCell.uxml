@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
+    <ui:VisualElement style="flex-grow: 0; width: 100%; flex-direction: row; height: 32px; align-items: center;">
+        <ui:Label text="Label" style="align-items: flex-start;" />
+        <ui:VisualElement style="flex-grow: 1;" />
+        <ui:Button text="Button" style="-unity-text-align: middle-right; align-items: flex-end; flex-direction: row-reverse;" />
+    </ui:VisualElement>
+</ui:UXML>
