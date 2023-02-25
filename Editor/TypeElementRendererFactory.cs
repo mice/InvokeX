@@ -15,9 +15,12 @@ public class TypeElementRendererFactory
         RegisterType(typeof(float), TypeElementRenderer.FloatRenderer);
         RegisterType(typeof(double), TypeElementRenderer.DoubleRenderer);
         RegisterType(typeof(string), TypeElementRenderer.StringRenderer);
+        RegisterType(typeof(UnityEngine.Color), TypeElementRenderer.ColorRenderer);
         RegisterType(typeof(UnityEngine.Vector2), TypeElementRenderer.Vec2Renderer);
         RegisterType(typeof(UnityEngine.Vector3), TypeElementRenderer.Vec3Renderer);
         RegisterType(typeof(UnityEngine.Vector4), TypeElementRenderer.Vec4Renderer);
+        RegisterType(typeof(System.Array), TypeElementRenderer.ArrayRenderer);
+        RegisterType(typeof(System.Collections.Generic.List<>), TypeElementRenderer.ListRenderer);
         RegisterType(typeof(UnityEngine.Object), TypeElementRenderer.UObjectRenderer);
         RegisterType(typeof(IParamData), TypeElementRenderer.IParamDataRenderer);
 
@@ -36,6 +39,37 @@ public class TypeElementRendererFactory
         {
             return creator.Invoke(type, label);
         }
+
+        //---
+        if (type.IsArray)
+        {
+            var subType = type.GetElementType();
+            var arrayType = typeof(System.Array);
+            if (!subType.IsArray) //多维数组,不支持
+            {
+                if (creatorDict.TryGetValue(arrayType, out var arrayCreator))
+                {
+                    return arrayCreator.Invoke(type, label);
+                }
+            }
+        }
+
+        if (type.IsGenericType)
+        {
+            var subType = type.GetGenericArguments()[0];
+            var genericListType = typeof(System.Collections.Generic.List<>);
+            var targetType = genericListType.MakeGenericType(subType);
+            if(type == targetType)
+            {
+                if (creatorDict.TryGetValue(genericListType, out var arrayCreator))
+                {
+                    return arrayCreator.Invoke(type, label);
+                }
+            }
+            UnityEngine.Debug.LogError($"XXX;{type}:tmpType:{genericListType};;;;{targetType} == {type}");
+        }
+     
+       
 
         var uObjectType = typeof(UnityEngine.Object);
         if (type.IsAssignableFrom(uObjectType))

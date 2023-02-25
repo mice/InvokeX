@@ -97,6 +97,18 @@ public partial class TypeElementRenderer
         return renderer;
     }
 
+    public static TypeElementRenderer ColorRenderer(System.Type targetType, string paramName)
+    {
+        var renderer = new TypeElementRenderer();
+        renderer.type = typeof(Color);
+        renderer.element = new ColorField(paramName);
+        renderer.ToValueFunc = (r) =>
+        {
+            return ((ColorField)renderer.element).value;
+        };
+        return renderer;
+    }
+
     public static TypeElementRenderer Vec2Renderer(System.Type targetType, string paramName)
     {
         var renderer = new TypeElementRenderer();
@@ -133,6 +145,105 @@ public partial class TypeElementRenderer
         return renderer;
     }
 
+    public static TypeElementRenderer ArrayRenderer(System.Type targetType, string paramName)
+    {
+        var renderer = new TypeElementRenderer();
+        renderer.type = typeof(System.Array);
+        var foldout = new Foldout();
+        foldout.text = paramName;
+        var subType = targetType.GetElementType();
+        var list = new List<TypeElementRenderer>();
+
+        var sizeElement = factory.GetRender(typeof(int), "Size");
+        var sizeElementView = (IntegerField)sizeElement.element;
+        sizeElementView.RegisterValueChangedCallback(t=> {
+            var newCount = t.newValue + 1;
+            var oldCount = foldout.childCount;
+            if (newCount > oldCount)
+            {
+                for (int i = oldCount; i < newCount; i++)
+                {
+                    var typeRender = factory.GetRender(subType, "Element" + (i));
+                    list.Add(typeRender);
+                    foldout.Add(typeRender.element);
+                }
+            }
+            else
+            {
+                while (foldout.childCount > newCount)
+                {
+                    foldout.RemoveAt(foldout.childCount - 1);
+                    list.RemoveAt(list.Count - 1);
+                }
+            }
+        });
+
+        //reactive;
+        foldout.Add(sizeElement.element);
+        foldout.userData = list;
+        renderer.element = foldout;
+        renderer.ToValueFunc = (r) =>
+        {
+            var obj = Array.CreateInstance(subType, sizeElementView.value);
+            for (int i = 0; i < list.Count; i++)
+            {
+                obj.SetValue(list[i].ToValueFunc(list[i]), i );
+            }
+            return obj;
+        };
+        return renderer;
+    }
+
+    public static TypeElementRenderer ListRenderer(System.Type targetType, string paramName)
+    {
+        var renderer = new TypeElementRenderer();
+        renderer.type = typeof(System.Collections.Generic.List<>);
+        var foldout = new Foldout();
+        foldout.text = paramName;
+        var subType = targetType.GetGenericArguments()[0];
+        var list = new List<TypeElementRenderer>();
+
+        var sizeElement = factory.GetRender(typeof(int), "Size");
+        var sizeElementView = (IntegerField)sizeElement.element;
+        sizeElementView.RegisterValueChangedCallback(t => {
+            var newCount = t.newValue + 1;
+            var oldCount = foldout.childCount;
+            if (newCount > oldCount)
+            {
+                for (int i = oldCount; i < newCount; i++)
+                {
+                    var typeRender = factory.GetRender(subType, "Element" + (i));
+                    list.Add(typeRender);
+                    foldout.Add(typeRender.element);
+                }
+            }
+            else
+            {
+                while (foldout.childCount > newCount)
+                {
+                    foldout.RemoveAt(foldout.childCount - 1);
+                    list.RemoveAt(list.Count - 1);
+                }
+            }
+        });
+
+        //reactive;
+        foldout.Add(sizeElement.element);
+        foldout.userData = list;
+        renderer.element = foldout;
+        renderer.ToValueFunc = (r) =>
+        {
+            var obj = System.Activator.CreateInstance(targetType) as System.Collections.IList;
+            for (int i = 0; i < list.Count; i++)
+            {
+                obj.Add(list[i].ToValueFunc(list[i]));
+            }
+            return obj;
+        };
+        return renderer;
+    }
+
+
     public static TypeElementRenderer UObjectRenderer(System.Type targetType, string paramName)
     {
         var renderer = new TypeElementRenderer();
@@ -142,6 +253,7 @@ public partial class TypeElementRenderer
         {
             return ((ObjectField)renderer.element).value;
         };
+     
         return renderer;
     }
 

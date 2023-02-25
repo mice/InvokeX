@@ -1,16 +1,11 @@
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
-using UnityEditor.UIElements;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using ILRuntime.CLR.Method;
 
-public static class UIRuntimeSetting
-{
-    public static string Fold = "Assets/Scripts/RuntimeCall/Editor/";
-}
 
 public class UIRuntimeCallV : EditorWindow
 {
@@ -42,13 +37,13 @@ public class UIRuntimeCallV : EditorWindow
 
     private void _LoadULLAndUSS(VisualElement root)
     {
-        var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(System.IO.Path.Combine(UIRuntimeSetting.Fold, "UIRuntimeCall.uxml"));
+        var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(System.IO.Path.Combine(UIRuntimeCallSetting.Fold, "UIRuntimeCall.uxml"));
         VisualElement labelFromUXML = visualTree.CloneTree();
         root.Add(labelFromUXML);
 
         // A stylesheet can be added to a VisualElement.
         // The style will be applied to the VisualElement and all of its children.
-        styleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>(System.IO.Path.Combine(UIRuntimeSetting.Fold, "UIRuntimeCall.uss"));
+        styleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>(System.IO.Path.Combine(UIRuntimeCallSetting.Fold, "UIRuntimeCall.uss"));
         root.styleSheets.Add(styleSheet);
     }
 
@@ -149,33 +144,45 @@ public class UIRuntimeCallV : EditorWindow
 
     private void OnSelectItem(string tab,System.Object target)
     {
-        if(target is MethodCLR method)
+        var scrollView = rootVisualElement.Q<ScrollView>("typeContainer");
+        if (scrollView != null)
         {
-            var scrollView = rootVisualElement.Q<ScrollView>("typeContainer");
-            if (scrollView != null)
+            if (target is MethodCLR methodCLR)
             {
-                TypeRenderUtils.RenderMethod(scrollView, method);
+                TypeRenderUtils.RenderMethod(scrollView, methodCLR);
                 var button = new Button();
                 button.text = "确认";
-                button.clicked += () => OnClickSubmit(tab, method);
+                button.clicked += () => OnClickSubmit(tab, methodCLR);
                 scrollView.Insert(0, button);
             }
-        }else if(target is MethodIL methodYYY)
-        {
-            var scrollView = rootVisualElement.Q<ScrollView>("typeContainer");
-            if (scrollView != null)
+            else if (target is MethodIL methodIL)
             {
-                if (methodYYY.ParamCount > 0)
+                if (methodIL.ParamCount > 0)
                 {
-                    TypeRenderUtils.RenderILParams(scrollView, methodYYY.Data.Parameters);
+                    TypeRenderUtils.RenderILParams(scrollView, methodIL.Data.Parameters);
                 }
-             
+
                 var button = new Button();
                 button.text = "确认";
-                button.clicked += () => OnClickSubmit(tab, methodYYY);
+                button.clicked += () => OnClickSubmit(tab, methodIL);
                 scrollView.Insert(0, button);
             }
         }
+    }
+
+    private object[] MakeParams(IMethodInfoData target, ParamRendererContainer renderContainer)
+    {
+        object[] arr;
+        if (target.ParamCount == 0)
+        {
+            arr = Array.Empty<object>();
+        }
+        else
+        {
+            arr = new object[target.ParamCount];
+            renderContainer.MakeParams(arr);
+        }
+        return arr;
     }
 
     private void OnClickSubmit(string sub, IMethodInfoData target)
@@ -185,17 +192,8 @@ public class UIRuntimeCallV : EditorWindow
             var scrollView = rootVisualElement.Q<ScrollView>("typeContainer");
             if (scrollView != null && scrollView.userData is ParamRendererContainer renderContainer)
             {
-                object[] arr;
-                if (target.ParamCount == 0)
-                {
-                    arr = Array.Empty<object>();
-                }
-                else
-                {
-                    arr = new object[target.ParamCount];
-                    renderContainer.MakeParams(arr);
-                }
-              
+                var arr = MakeParams(target, renderContainer);
+
                 if (target is MethodCLR method)
                 {
                     RuntimeCallManager.Instance.Invoke(sub, method.Name, arr);
@@ -315,7 +313,7 @@ public class ContainerData<T>
 
     private VisualElement _MakeItem()
     {
-        var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(UIRuntimeSetting.Fold + "MethodItemCell.uxml");
+        var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(UIRuntimeCallSetting.Fold + "MethodItemCell.uxml");
         VisualElement labelFromUXML = visualTree.CloneTree();
         labelFromUXML.AddToClassList("gmitem");
         if (styleSheet != null)

@@ -35,6 +35,7 @@ public static partial class TypeRenderUtils
             }
             container.list.Add(renderer);
         }
+
         selectItemViews.userData = container;
     }
 
