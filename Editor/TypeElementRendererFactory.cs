@@ -20,10 +20,16 @@ public class TypeElementRendererFactory
         RegisterType(typeof(double), TypeElementRenderer.DoubleRenderer);
         RegisterType(typeof(bool), TypeElementRenderer.BoolRenderer);
         RegisterType(typeof(string), TypeElementRenderer.StringRenderer);
+
         RegisterType(typeof(UnityEngine.Color), TypeElementRenderer.ColorRenderer);
         RegisterType(typeof(UnityEngine.Vector2), TypeElementRenderer.Vec2Renderer);
+        RegisterType(typeof(UnityEngine.Vector2Int), TypeElementRenderer.Vec2IntRenderer);
         RegisterType(typeof(UnityEngine.Vector3), TypeElementRenderer.Vec3Renderer);
+        RegisterType(typeof(UnityEngine.Vector3Int), TypeElementRenderer.Vec3IntRenderer);
         RegisterType(typeof(UnityEngine.Vector4), TypeElementRenderer.Vec4Renderer);
+        RegisterType(typeof(UnityEngine.Rect), TypeElementRenderer.RectRenderer);
+        RegisterType(typeof(UnityEngine.RectInt), TypeElementRenderer.RectIntRenderer);
+
         RegisterType(typeof(System.Array), TypeElementRenderer.ArrayRenderer);
         RegisterType(typeof(System.Collections.Generic.List<>), TypeElementRenderer.ListRenderer);
         RegisterType(typeof(UnityEngine.Object), TypeElementRenderer.UObjectRenderer);

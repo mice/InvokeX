@@ -205,6 +205,56 @@ public partial class TypeElementRenderer
         return renderer;
     }
 
+    public static TypeElementRenderer Vec2IntRenderer(System.Type targetType, string paramName)
+    {
+        var renderer = new TypeElementRenderer();
+        renderer.type = typeof(Vector2Int);
+        renderer.element = new Vector2IntField(paramName);
+        renderer.ToValueFunc = (r) =>
+        {
+            return ((Vector2IntField)renderer.element).value;
+        };
+        return renderer;
+    }
+
+    public static TypeElementRenderer Vec3IntRenderer(System.Type targetType, string paramName)
+    {
+        var renderer = new TypeElementRenderer();
+        renderer.type = typeof(Vector3Int);
+        renderer.element = new Vector3IntField(paramName);
+        renderer.ToValueFunc = (r) =>
+        {
+            return ((Vector3IntField)renderer.element).value;
+        };
+        return renderer;
+    }
+
+    public static TypeElementRenderer RectRenderer(System.Type targetType, string paramName)
+    {
+        var renderer = new TypeElementRenderer();
+        renderer.type = typeof(Rect);
+       
+        renderer.element = new RectField(paramName);
+        renderer.ToValueFunc = (r) =>
+        {
+            return ((RectField)renderer.element).value;
+        };
+        return renderer;
+    }
+
+    public static TypeElementRenderer RectIntRenderer(System.Type targetType, string paramName)
+    {
+        var renderer = new TypeElementRenderer();
+        renderer.type = typeof(RectInt);
+
+        renderer.element = new RectIntField(paramName);
+        renderer.ToValueFunc = (r) =>
+        {
+            return ((RectIntField)renderer.element).value;
+        };
+        return renderer;
+    }
+
     public static TypeElementRenderer ArrayRenderer(System.Type targetType, string paramName)
     {
         var renderer = new TypeElementRenderer();
