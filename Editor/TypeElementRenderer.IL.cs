@@ -22,7 +22,6 @@ public partial class TypeElementRenderer
 
             var fieldCount = ilType.TotalFieldCount;
 
-            UnityEngine.Debug.LogError($"RenderILType:{ilType},fieldCount:{fieldCount},reflectType:{ilType.ReflectionType}");
             for (int i = 0; i < fieldCount; i++)
             {
                 var tmpFieldType = ilType.GetField(i, out var fd);

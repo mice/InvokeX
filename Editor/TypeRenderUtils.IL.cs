@@ -32,7 +32,6 @@ public static partial class TypeRenderUtils
 
     private static TypeElementRenderer GetILTypeView(System.Type parameterType, string paramName)
     {
-        UnityEngine.Debug.LogError($"{paramName} |{ parameterType.UnderlyingSystemType } == {parameterType == parameterType.UnderlyingSystemType}::{typeof(ILRuntime.CLR.TypeSystem.ILType)}");
         if (parameterType.UnderlyingSystemType == typeof(ILTypeInstance))
         {
             var renderer = factory.GetRender(parameterType, paramName);
