@@ -49,11 +49,32 @@ public partial class TypeElementRenderer
                     }
                     list.Add(subRender);
                 }
+                else if(tmpFieldType.IsArray)
+                {
+                    var subRender = factory.GetRender(tmpFieldType.TypeForCLR, fd.Name);
+                    if (subRender != null)
+                    {
+                        foldout.Add(subRender.element);
+                    }
+                    else
+                    {
+                        UnityEngine.Debug.LogError($"array To type:{ilType} index:{i},fieldType:{tmpFieldType}===clr:{tmpFieldType.TypeForCLR}");
+                    }
+                    list.Add(subRender);
+                }
                 else
                 {
                     UnityEngine.Debug.LogError($"Field To type:{ilType} index:{i},fieldType:{tmpFieldType}");
                 }
             }
+        }
+        else if (parameterType.FullName == "ILRuntime.Runtime.Intepreter.ILTypeInstance")
+        {
+            UnityEngine.Debug.LogError($"ILTypeRender Null:");
+        }
+        else
+        {
+            UnityEngine.Debug.LogError($"ILTypeRender Null:");
         }
 
         renderer.element = foldout;
