@@ -8,6 +8,10 @@ public class TypeElementRendererFactory
 
     public TypeElementRendererFactory Init()
     {
+        RegisterType(typeof(sbyte), TypeElementRenderer.ByteRenderer);
+        RegisterType(typeof(byte), TypeElementRenderer.UByteRenderer);
+        RegisterType(typeof(short), TypeElementRenderer.ShortRenderer);
+        RegisterType(typeof(ushort), TypeElementRenderer.UShortRenderer);
         RegisterType(typeof(int), TypeElementRenderer.IntRenderer);
         RegisterType(typeof(uint), TypeElementRenderer.UIntRenderer);
         RegisterType(typeof(long), TypeElementRenderer.LongRenderer);

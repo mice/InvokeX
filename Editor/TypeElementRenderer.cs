@@ -5,12 +5,59 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-
 public partial class TypeElementRenderer
 {
     public Type type;
     public VisualElement element;
     public System.Func<TypeElementRenderer, System.Object> ToValueFunc;
+
+    public static TypeElementRenderer ByteRenderer(System.Type targetType, string paramName)
+    {
+        var renderer = new TypeElementRenderer();
+        renderer.type = typeof(sbyte);
+        renderer.element = new IntegerField(paramName);
+        renderer.ToValueFunc = (r) =>
+        {
+            return (sbyte)((IntegerField)renderer.element).value;
+        };
+        return renderer;
+    }
+
+    public static TypeElementRenderer UByteRenderer(System.Type targetType, string paramName)
+    {
+        var renderer = new TypeElementRenderer();
+        renderer.type = typeof(byte);
+        renderer.element = new IntegerField(paramName);
+        renderer.ToValueFunc = (r) =>
+        {
+            return (byte)((IntegerField)renderer.element).value;
+        };
+        return renderer;
+    }
+
+    public static TypeElementRenderer ShortRenderer(System.Type targetType, string paramName)
+    {
+        var renderer = new TypeElementRenderer();
+        renderer.type = typeof(short);
+        renderer.element = new IntegerField(paramName);
+        renderer.ToValueFunc = (r) =>
+        {
+            return (short)((IntegerField)renderer.element).value;
+        };
+        return renderer;
+    }
+
+    public static TypeElementRenderer UShortRenderer(System.Type targetType, string paramName)
+    {
+        var renderer = new TypeElementRenderer();
+        renderer.type = typeof(ushort);
+        renderer.element = new IntegerField(paramName);
+        renderer.ToValueFunc = (r) =>
+        {
+            return (ushort)((IntegerField)renderer.element).value;
+        };
+        return renderer;
+    }
 
     public static TypeElementRenderer IntRenderer(System.Type targetType,string paramName)
     {
