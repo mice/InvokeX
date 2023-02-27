@@ -135,8 +135,6 @@ public partial class TypeElementRenderer
         return renderer;
     }
 
-
-
     private static TypeElementRenderer RenderILType2(IType ilType, string paramName)
     {
         var renderer = new TypeElementRenderer();
@@ -146,31 +144,7 @@ public partial class TypeElementRenderer
         if (ilType is ILRuntime.CLR.TypeSystem.ILType ilRuntimeType)
         {
             foldout.text = paramName;
-
-            var fieldCount = ilType.TotalFieldCount;
-
-            for (int i = 0; i < fieldCount; i++)
-            {
-                var tmpFieldType = ilRuntimeType.GetField(i, out var fd);
-                if (tmpFieldType is CLRType clrType)
-                {
-                    var subRender = factory.GetRender(clrType.TypeForCLR, fd.Name);
-                    if (subRender != null)
-                    {
-                        foldout.Add(subRender.element);
-                    }
-                    list.Add(subRender);
-                }
-                else if (tmpFieldType.TypeForCLR == typeof(ILRuntime.Runtime.Intepreter.ILTypeInstance))
-                {
-                    var subRender = RenderILType2(tmpFieldType, fd.Name);
-                    if (subRender != null)
-                    {
-                        foldout.Add(subRender.element);
-                    }
-                    list.Add(subRender);
-                }
-            }
+            __RenderILType2(foldout, list, ilType, ilRuntimeType);
         }
         renderer.element = foldout;
         renderer.ToValueFunc = t =>
