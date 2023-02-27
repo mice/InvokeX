@@ -60,7 +60,7 @@ public partial class TypeElementRenderer
         renderer.ToValueFunc = t =>
         {
             var appDomain = ILRuntimeCallManager.AppDomain;
-            var obj = appDomain.Instantiate(parameterType.Name);
+            var obj = appDomain.Instantiate(parameterType.FullName);
             if (parameterType is ILRuntime.Reflection.ILRuntimeType ilRuntimeType2)
             {
                 foldout.text = paramName;

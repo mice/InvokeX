@@ -56,23 +56,40 @@ public class CallDataProvider
         targetMgr.GetTypeDictionary(typeDict);
     }
 
-    private void InitILCall()
+    private ILRuntime.Runtime.Enviorment.AppDomain GetAppDomain()
     {
+        if (!Application.isPlaying)
+            return null;
+        // if (QKILRuntimeEngine.Instance != null)
+        // {
+        //     return QKILRuntimeEngine.Instance.Appdomain;
+        // }
+        
         var appMain = GameObject.FindObjectOfType<AppMain>();
         if (appMain == null || appMain.ilRuntime == null)
-            return;
+            return null;
 
-        var appdomain = appMain.ilRuntime.AppDomain;
+        return appMain.ilRuntime.AppDomain;
+    }
+
+    private void InitILCall()
+    {
+        var appdomain = GetAppDomain();
         var mgr = ILRuntimeCallManager.Instance;
         if (appdomain != null)
         {
             mgr.SetDomain(appdomain);
+            AddILCall(appdomain, mgr);
         }
+    }
 
+    private void AddILCall(ILRuntime.Runtime.Enviorment.AppDomain appdomain, ILRuntimeCallManager mgr)
+    {
         if (appdomain.LoadedTypes.TryGetValue("TestLog", out var ilType))
         {
             var logInstance = appdomain.Instantiate("TestLog");
-            mgr.AddInstance("TestLog", logInstance);
+            if (logInstance != null)
+                mgr.AddInstance("TestLog", logInstance);
         }
 
         if (appdomain.LoadedTypes.TryGetValue("DLog", out var ilType2))
