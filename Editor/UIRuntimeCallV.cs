@@ -149,7 +149,14 @@ public class UIRuntimeCallV : EditorWindow
         {
             if (target is MethodCLR methodCLR)
             {
-                TypeRenderUtils.RenderMethod(scrollView, methodCLR);
+                if (methodCLR.ParamCount > 0)
+                {
+                    TypeRenderUtils.RenderMethod(scrollView, methodCLR);
+                }
+                else
+                {
+                    scrollView.Clear();
+                }
                 var button = new Button();
                 button.text = "х╥хо";
                 button.clicked += () => OnClickSubmit(tab, methodCLR);
@@ -160,6 +167,10 @@ public class UIRuntimeCallV : EditorWindow
                 if (methodIL.ParamCount > 0)
                 {
                     TypeRenderUtils.RenderILParams(scrollView, methodIL.Data.Parameters);
+                }
+                else
+                {
+                    scrollView.Clear();
                 }
 
                 var button = new Button();
