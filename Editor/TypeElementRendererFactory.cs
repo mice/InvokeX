@@ -18,6 +18,7 @@ public class TypeElementRendererFactory
         RegisterType(typeof(ulong), TypeElementRenderer.ULongRenderer);
         RegisterType(typeof(float), TypeElementRenderer.FloatRenderer);
         RegisterType(typeof(double), TypeElementRenderer.DoubleRenderer);
+        RegisterType(typeof(bool), TypeElementRenderer.BoolRenderer);
         RegisterType(typeof(string), TypeElementRenderer.StringRenderer);
         RegisterType(typeof(UnityEngine.Color), TypeElementRenderer.ColorRenderer);
         RegisterType(typeof(UnityEngine.Vector2), TypeElementRenderer.Vec2Renderer);

@@ -132,6 +132,18 @@ public partial class TypeElementRenderer
         return renderer;
     }
 
+    public static TypeElementRenderer BoolRenderer(System.Type targetType, string paramName)
+    {
+        var renderer = new TypeElementRenderer();
+        renderer.type = typeof(bool);
+        renderer.element = new Toggle(paramName);
+        renderer.ToValueFunc = (r) =>
+        {
+            return (bool)((Toggle)renderer.element).value;
+        };
+        return renderer;
+    }
+
     public static TypeElementRenderer StringRenderer(System.Type targetType, string paramName)
     {
         var renderer = new TypeElementRenderer();
