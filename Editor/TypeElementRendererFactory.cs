@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-public class TypeElementRendererFactory
+public class TypeElementRendererFactory:IElementRendererFactory
 {
-    private Dictionary<Type, System.Func<System.Type, string, TypeElementRenderer>> creatorDict = new Dictionary<Type, Func<System.Type, string, TypeElementRenderer>>();
-
+    public Dictionary<Type, System.Func<System.Type, string, TypeElementRenderer>> creatorDict { get; private set; } = new Dictionary<Type, Func<System.Type, string, TypeElementRenderer>>();
 
     public TypeElementRendererFactory Init()
     {

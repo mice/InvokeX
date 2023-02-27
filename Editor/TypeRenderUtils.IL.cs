@@ -1,10 +1,4 @@
-﻿using ILRuntime.CLR.TypeSystem;
-using ILRuntime.Runtime.Intepreter;
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using UnityEditor.UIElements;
-using UnityEngine;
+﻿using System.Collections.Generic;
 using UnityEngine.UIElements;
 
 public static partial class TypeRenderUtils
@@ -32,7 +26,7 @@ public static partial class TypeRenderUtils
 
     private static TypeElementRenderer GetILTypeView(System.Type parameterType, string paramName)
     {
-        if (parameterType.UnderlyingSystemType == typeof(ILTypeInstance))
+        if (parameterType.UnderlyingSystemType == typeof(ILRuntime.Runtime.Intepreter.ILTypeInstance))
         {
             var renderer = factory.GetRender(parameterType, paramName);
             if (renderer == null)

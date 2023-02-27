@@ -6,20 +6,17 @@ using System.Collections.Generic;
 using System.Reflection;
 using ILRuntime.CLR.Method;
 
-
-public class UIRuntimeCallV : EditorWindow
+/// <summary>
+//public static void ShowUIRuntime()
+//{
+//    var wnd = EditorWindow.GetWindow<UIRuntimeCall>(true, nameof(UIRuntimeCall));
+//    wnd.minSize = new Vector2(1200, 300);
+//}
+/// </summary>
+public class UIRuntimeCall : EditorWindow
 {
-    
-    [MenuItem("Window/UIElements/UIRuntimeCallX")]
-    public static void ShowExample()
-    {
-        var wnd = EditorWindow.GetWindow<UIRuntimeCallV>(true, nameof(UIRuntimeCallV));
-        wnd.minSize = new Vector2(1200, 300);
-    }
-
     private TabbedMenuController menuController;
     private StyleSheet styleSheet;
-   
 
     public void CreateGUI()
     {
@@ -70,6 +67,11 @@ public class UIRuntimeCallV : EditorWindow
         }
     }
 
+    protected virtual CallDataProvider GetDataProvider()
+    {
+        return new CallDataProvider();
+    }
+
     private void _CreateUI(VisualElement root)
     {
         try
@@ -81,7 +83,7 @@ public class UIRuntimeCallV : EditorWindow
         {
             UnityEngine.Debug.LogError(exce.ToString());
         }
-        var callDataProvider = new CallDataProvider();
+        var callDataProvider = GetDataProvider();
 
         try
         {
@@ -243,14 +245,6 @@ public class UIRuntimeCallV : EditorWindow
             tabContentContainer.Add(cont);
         }
     }
-}
-
-public interface IMethodInfoData
-{
-    String Name { get; }
-
-    int ParamCount { get; }
-    ParameterInfo[] GetParameters();
 }
 
 public class MethodCLR : IMethodInfoData

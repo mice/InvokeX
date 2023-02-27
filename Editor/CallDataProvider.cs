@@ -10,7 +10,7 @@ public class CallDataProvider
 {
     public Dictionary<string, Type> typeDict = new Dictionary<string, Type>();
 
-    public void ShowTextLevelUp()
+    public virtual void ShowTextLevelUp()
     {
         if (!Application.isPlaying)
             return;
@@ -32,7 +32,7 @@ public class CallDataProvider
         InitILCall();
     }
 
-    public void CreateTabs(List<string> tabs, List<bool> tabTypes)
+    public virtual void CreateTabs(List<string> tabs, List<bool> tabTypes)
     {
         tabs.Clear();
         tabTypes.Clear();
@@ -47,16 +47,16 @@ public class CallDataProvider
         tabTypes.Add(false);
     }
 
-    private void InitTypes()
+    protected virtual void InitTypes()
     {
-        var targetMgr = RuntimeCallManager.Instance;
-        targetMgr.AddInstance(nameof(GMScripts), new GMScripts());
-        targetMgr.AddInstance(nameof(ProtocalX), new ProtocalX());
-        targetMgr.AddStatic(typeof(ViewUtils));
-        targetMgr.GetTypeDictionary(typeDict);
+        //var targetMgr = RuntimeCallManager.Instance;
+        //targetMgr.AddInstance(nameof(GMScripts), new GMScripts());
+        //targetMgr.AddInstance(nameof(ProtocalX), new ProtocalX());
+        //targetMgr.AddStatic(typeof(ViewUtils));
+        //targetMgr.GetTypeDictionary(typeDict);
     }
 
-    private ILRuntime.Runtime.Enviorment.AppDomain GetAppDomain()
+    protected virtual ILRuntime.Runtime.Enviorment.AppDomain GetAppDomain()
     {
         if (!Application.isPlaying)
             return null;
@@ -64,15 +64,16 @@ public class CallDataProvider
         // {
         //     return QKILRuntimeEngine.Instance.Appdomain;
         // }
-        
-        var appMain = GameObject.FindObjectOfType<AppMain>();
-        if (appMain == null || appMain.ilRuntime == null)
-            return null;
 
-        return appMain.ilRuntime.AppDomain;
+        //var appMain = GameObject.FindObjectOfType<AppMain>();
+        //if (appMain == null || appMain.ilRuntime == null)
+        //    return null;
+
+        //return appMain.ilRuntime.AppDomain;
+        return null;
     }
 
-    private void InitILCall()
+    protected virtual void InitILCall()
     {
         var appdomain = GetAppDomain();
         var mgr = ILRuntimeCallManager.Instance;
@@ -83,18 +84,18 @@ public class CallDataProvider
         }
     }
 
-    private void AddILCall(ILRuntime.Runtime.Enviorment.AppDomain appdomain, ILRuntimeCallManager mgr)
+    protected virtual void AddILCall(ILRuntime.Runtime.Enviorment.AppDomain appdomain, ILRuntimeCallManager mgr)
     {
-        if (appdomain.LoadedTypes.TryGetValue("TestLog", out var ilType))
-        {
-            var logInstance = appdomain.Instantiate("TestLog");
-            if (logInstance != null)
-                mgr.AddInstance("TestLog", logInstance);
-        }
+        //if (appdomain.LoadedTypes.TryGetValue("TestLog", out var ilType))
+        //{
+        //    var logInstance = appdomain.Instantiate("TestLog");
+        //    if (logInstance != null)
+        //        mgr.AddInstance("TestLog", logInstance);
+        //}
 
-        if (appdomain.LoadedTypes.TryGetValue("DLog", out var ilType2))
-        {
-            mgr.AddStatic((ILRuntime.CLR.TypeSystem.ILType)ilType2);
-        }
+        //if (appdomain.LoadedTypes.TryGetValue("DLog", out var ilType2))
+        //{
+        //    mgr.AddStatic((ILRuntime.CLR.TypeSystem.ILType)ilType2);
+        //}
     }
 }

@@ -1,17 +1,11 @@
-﻿using ILRuntime.CLR.TypeSystem;
-using ILRuntime.Runtime.Intepreter;
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using UnityEditor.UIElements;
-using UnityEngine;
+﻿using System.Reflection;
 using UnityEngine.UIElements;
-
 
 public static partial class TypeRenderUtils
 {
     private static TypeElementRendererFactory factory = new TypeElementRendererFactory().Init();
-    static TypeRenderUtils(){
+    static TypeRenderUtils()
+    {
         TypeElementRendererExt.factory = factory;
     }
 

@@ -1,0 +1,16 @@
+{
+    "name": "RuntimeCall.Editor",
+    "references": [
+        "GUID:04a4f61453f05e0458eeb78a7fb1fd64",
+        "GUID:7a1fa966b0ea23f40a6a4dc4dab1e297"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
