@@ -63,17 +63,20 @@ public class TypeElementRendererFactory
             var subType = type.GetGenericArguments()[0];
             var genericListType = typeof(System.Collections.Generic.List<>);
             var targetType = genericListType.MakeGenericType(subType);
-            if(type == targetType)
+            if (type.FullName.StartsWith("System.Collections.Generic.List`1"))
             {
                 if (creatorDict.TryGetValue(genericListType, out var arrayCreator))
                 {
                     return arrayCreator.Invoke(type, label);
                 }
             }
-            UnityEngine.Debug.LogError($"XXX;{type}:tmpType:{genericListType};;;;{targetType} == {type}");
+            else
+            {
+                UnityEngine.Debug.LogError($"OnlySupport:List<T>;{type}:{type.FullName}:tmpType:{genericListType};;;;{targetType} == {type}");
+            }
         }
-     
-       
+
+
 
         var uObjectType = typeof(UnityEngine.Object);
         if (type.IsAssignableFrom(uObjectType))
@@ -93,7 +96,7 @@ public class TypeElementRendererFactory
             }
         }
 
-        if(type.UnderlyingSystemType == typeof(ILRuntime.Runtime.Intepreter.ILTypeInstance))
+        if (type.UnderlyingSystemType == typeof(ILRuntime.Runtime.Intepreter.ILTypeInstance))
         {
             if (creatorDict.TryGetValue(typeof(ILRuntime.Runtime.Intepreter.ILTypeInstance), out var uObjCreator))
             {
