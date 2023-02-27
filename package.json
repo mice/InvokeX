@@ -1,0 +1,11 @@
+{
+    "name": "com.runtimecall",
+    "displayName": "RuntimeCall",
+    "version": "1.0.0",
+    "unity": "2019.4",
+    "keywords": ["RuntimeCall"],
+    "description": ".",
+    "dependencies": {
+       
+    }
+}

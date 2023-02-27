@@ -5,12 +5,8 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public partial class TypeElementRenderer
+public static partial class TypeElementRendererExt
 {
-    public Type type;
-    public VisualElement element;
-    public System.Func<TypeElementRenderer, System.Object> ToValueFunc;
-
     public static TypeElementRenderer ByteRenderer(System.Type targetType, string paramName)
     {
         var renderer = new TypeElementRenderer();

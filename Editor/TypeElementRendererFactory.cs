@@ -8,34 +8,34 @@ public class TypeElementRendererFactory
 
     public TypeElementRendererFactory Init()
     {
-        RegisterType(typeof(sbyte), TypeElementRenderer.ByteRenderer);
-        RegisterType(typeof(byte), TypeElementRenderer.UByteRenderer);
-        RegisterType(typeof(short), TypeElementRenderer.ShortRenderer);
-        RegisterType(typeof(ushort), TypeElementRenderer.UShortRenderer);
-        RegisterType(typeof(int), TypeElementRenderer.IntRenderer);
-        RegisterType(typeof(uint), TypeElementRenderer.UIntRenderer);
-        RegisterType(typeof(long), TypeElementRenderer.LongRenderer);
-        RegisterType(typeof(ulong), TypeElementRenderer.ULongRenderer);
-        RegisterType(typeof(float), TypeElementRenderer.FloatRenderer);
-        RegisterType(typeof(double), TypeElementRenderer.DoubleRenderer);
-        RegisterType(typeof(bool), TypeElementRenderer.BoolRenderer);
-        RegisterType(typeof(string), TypeElementRenderer.StringRenderer);
+        RegisterType(typeof(sbyte), TypeElementRendererExt.ByteRenderer);
+        RegisterType(typeof(byte), TypeElementRendererExt.UByteRenderer);
+        RegisterType(typeof(short), TypeElementRendererExt.ShortRenderer);
+        RegisterType(typeof(ushort), TypeElementRendererExt.UShortRenderer);
+        RegisterType(typeof(int), TypeElementRendererExt.IntRenderer);
+        RegisterType(typeof(uint), TypeElementRendererExt.UIntRenderer);
+        RegisterType(typeof(long), TypeElementRendererExt.LongRenderer);
+        RegisterType(typeof(ulong), TypeElementRendererExt.ULongRenderer);
+        RegisterType(typeof(float), TypeElementRendererExt.FloatRenderer);
+        RegisterType(typeof(double), TypeElementRendererExt.DoubleRenderer);
+        RegisterType(typeof(bool), TypeElementRendererExt.BoolRenderer);
+        RegisterType(typeof(string), TypeElementRendererExt.StringRenderer);
 
-        RegisterType(typeof(UnityEngine.Color), TypeElementRenderer.ColorRenderer);
-        RegisterType(typeof(UnityEngine.Vector2), TypeElementRenderer.Vec2Renderer);
-        RegisterType(typeof(UnityEngine.Vector2Int), TypeElementRenderer.Vec2IntRenderer);
-        RegisterType(typeof(UnityEngine.Vector3), TypeElementRenderer.Vec3Renderer);
-        RegisterType(typeof(UnityEngine.Vector3Int), TypeElementRenderer.Vec3IntRenderer);
-        RegisterType(typeof(UnityEngine.Vector4), TypeElementRenderer.Vec4Renderer);
-        RegisterType(typeof(UnityEngine.Rect), TypeElementRenderer.RectRenderer);
-        RegisterType(typeof(UnityEngine.RectInt), TypeElementRenderer.RectIntRenderer);
+        RegisterType(typeof(UnityEngine.Color), TypeElementRendererExt.ColorRenderer);
+        RegisterType(typeof(UnityEngine.Vector2), TypeElementRendererExt.Vec2Renderer);
+        RegisterType(typeof(UnityEngine.Vector2Int), TypeElementRendererExt.Vec2IntRenderer);
+        RegisterType(typeof(UnityEngine.Vector3), TypeElementRendererExt.Vec3Renderer);
+        RegisterType(typeof(UnityEngine.Vector3Int), TypeElementRendererExt.Vec3IntRenderer);
+        RegisterType(typeof(UnityEngine.Vector4), TypeElementRendererExt.Vec4Renderer);
+        RegisterType(typeof(UnityEngine.Rect), TypeElementRendererExt.RectRenderer);
+        RegisterType(typeof(UnityEngine.RectInt), TypeElementRendererExt.RectIntRenderer);
 
-        RegisterType(typeof(System.Array), TypeElementRenderer.ArrayRenderer);
-        RegisterType(typeof(System.Collections.Generic.List<>), TypeElementRenderer.ListRenderer);
-        RegisterType(typeof(UnityEngine.Object), TypeElementRenderer.UObjectRenderer);
-        RegisterType(typeof(IParamData), TypeElementRenderer.IParamDataRenderer);
+        RegisterType(typeof(System.Array), TypeElementRendererExt.ArrayRenderer);
+        RegisterType(typeof(System.Collections.Generic.List<>), TypeElementRendererExt.ListRenderer);
+        RegisterType(typeof(UnityEngine.Object), TypeElementRendererExt.UObjectRenderer);
+        RegisterType(typeof(IParamData), TypeElementRendererExt.IParamDataRenderer);
 
-        RegisterType(typeof(ILRuntime.Runtime.Intepreter.ILTypeInstance), TypeElementRenderer.ILTypeRender);
+        RegisterType(typeof(ILRuntime.Runtime.Intepreter.ILTypeInstance), TypeElementRendererExt.ILTypeRender);
         return this;
     }
 

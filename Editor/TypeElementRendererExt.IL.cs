@@ -6,8 +6,7 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-
-public partial class TypeElementRenderer
+public static partial class TypeElementRendererExt
 {
     public static TypeElementRenderer ILTypeRender(System.Type parameterType, string paramName)
     {
