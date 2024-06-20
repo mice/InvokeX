@@ -9,6 +9,8 @@ public static partial class TypeRenderUtils
         TypeElementRendererExt.factory = factory;
     }
 
+    public static TypeElementRenderer GetRender(System.Type type, string label) => factory.GetRender(type, label);
+
     public static void RenderParams(ScrollView selectItemViews, ParameterInfo[] parameterInfos,string methodName = "UnNamed")
     {
         selectItemViews.Clear();
