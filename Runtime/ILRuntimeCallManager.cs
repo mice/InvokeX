@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿#if !DISABLE_ILRUNTIME
+using System.Collections.Generic;
 using ILRuntime.CLR.Method;
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Runtime.Enviorment;
 using ILRuntime.Runtime.Intepreter;
+using UnityEngine;
 
 public class ILRuntimeCallManager
 {
@@ -126,6 +128,35 @@ public class ILRuntimeCallManager
         }
     }
 
+    public void GetCollectMethodDictionary(SerDict<string, (string, string,bool)> methodDict, Dictionary<string, IMethod> typeDict)
+    {
+        var logMethName = string.Empty;
+
+        foreach (var methodItem in methodDict)
+        {
+            var typeName = methodItem.Value.Item1;
+            if (string.Equals(typeName, "CPlayerMsgCallerProxy"))
+                typeName = "Protocal";
+
+            if (methodItem.Value.Item3 && targetCallDict.TryGetValue(typeName, out var _target) && typeMethodDict.TryGetValue(_target.Item1, out var methodTable))
+            {
+                var methodName = methodItem.Key;
+                var methodTableDict = methodTable.dict;
+                if (methodTableDict.ContainsKey(methodName))
+                {
+                    typeDict[methodName] = methodTableDict[methodName];
+                }
+                else
+                {
+                    UnityEngine.Debug.LogError($"methodTableDict  not Contains{methodName}");
+                    logMethName = methodName;
+                    var collectCallManager = CollectCallManager.Instance;
+                    collectCallManager.DeleteCollectMethod(logMethName);
+                }
+            }
+        }
+    }
+
     public void Invoke(string typeName,string methodName)
     {
         if (targetCallDict.TryGetValue(typeName, out var _target) && typeMethodDict.TryGetValue(_target.Item1, out var methodTable))
@@ -142,3 +173,4 @@ public class ILRuntimeCallManager
         }
     }
 }
+#endif

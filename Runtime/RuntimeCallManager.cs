@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-using UnityEngine;
+
 
 /// <summary>
 /// 作为一个marker
@@ -97,6 +96,39 @@ public class RuntimeCallManager
             }
         }
     }
+
+    public void GetCollectMethodDictionary(SerDict<string, (string, string,bool)> methodDict, Dictionary<string, MethodBase> typeDict)
+    {
+        var logMethName = string.Empty;
+    
+        foreach (var methodItem in methodDict)
+        {
+            var typeName = methodItem.Value.Item1;
+            if (string.Equals(typeName, "CPlayerMsgCallerProxy"))
+                typeName = "Protocal";
+
+            if (methodItem.Value.Item3 == false && targetCallDict.TryGetValue(typeName, out var _target) && typeMethodDict.TryGetValue(_target.Item1, out var methodTable))
+            {
+                var methodName = methodItem.Key;
+                var methodTableDict = methodTable.dict;
+                if (methodTableDict.ContainsKey(methodName))
+                {
+                    typeDict[methodName] = methodTableDict[methodName];
+                }
+                else
+                {
+                    UnityEngine.Debug.LogError($"methodTableDict  not Contains{methodName}");
+                    logMethName = methodName;      
+                    
+                    var collectCallManager = CollectCallManager.Instance;
+                    collectCallManager.DeleteCollectMethod(logMethName);
+                }
+            }
+        }
+
+
+    }
+
 
     public void AddStatic(Type type)
     {

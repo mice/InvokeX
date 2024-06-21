@@ -1,15 +1,17 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
+using UnityEditor.UIElements;
+using UnityEngine;
 using UnityEngine.UIElements;
+
 
 public static partial class TypeRenderUtils
 {
     private static TypeElementRendererFactory factory = new TypeElementRendererFactory().Init();
-    static TypeRenderUtils()
-    {
-        TypeElementRendererExt.factory = factory;
+    static TypeRenderUtils(){
+        //TypeElementRenderer.factory = factory;
     }
-
-    public static TypeElementRenderer GetRender(System.Type type, string label) => factory.GetRender(type, label);
 
     public static void RenderParams(ScrollView selectItemViews, ParameterInfo[] parameterInfos,string methodName = "UnNamed")
     {
@@ -33,11 +35,42 @@ public static partial class TypeRenderUtils
         }
 
         selectItemViews.userData = container;
+
+
+    }
+
+    public static void RenderLogParams(ScrollView selectItemViews, object[] Params) {
+        var children= selectItemViews.Children();
+        int i = 0;
+        foreach (var child in children)
+        {
+            int num = 0;
+            var strParams= Params[i].ToString();
+            if (int.TryParse(strParams, out num))
+            {
+                var intField = child as UnityEditor.UIElements.IntegerField;
+                intField.value = num;
+            }
+            else
+            {
+                var textField = child as UnityEngine.UIElements.TextField;
+                textField.value = strParams;
+            }
+            
+            i += 1;
+        }
     }
 
     public static void RenderMethod(ScrollView selectItemViews, MethodCLR method)
     {
         ParameterInfo[] parameterInfos = method.GetParameters();
         RenderParams(selectItemViews, parameterInfos);
+    }
+
+    public static void RenderMethodAndParams(ScrollView selectItemViews, MethodCLR method,object[] Parameters)
+    {
+        ParameterInfo[] parameterInfos = method.GetParameters();
+        RenderParams(selectItemViews, parameterInfos);
+        RenderLogParams(selectItemViews, Parameters);
     }
 }

@@ -10,6 +10,39 @@ Label {
     height:32px;
 }
 
+.cmdBtn{
+    height: 32px; 
+    -unity-text-align: upper-center; 
+    align-items: center;
+    justify-content: center;
+}
+
+.CarryBtn{
+    width: 60px;
+    height: 30px; 
+    -unity-text-align: middle-center;
+    align-items: center;
+    justify-content: center;
+
+    --left: 120px;
+    --justify-content: center;
+    --align-self: flex-end;
+}
+
+.CollectPattern{
+    width: 60px;
+    height: 30px; 
+    -unity-text-align: middle-center; 
+    align-items: center;
+    justify-content: center;
+
+    --align-self: center ;
+    --left:300px;
+    --border-bottom-left-radius:30px;
+}
+
+
+
 #tabContainer
 {
     flex-direction:column;
@@ -81,4 +114,7 @@ Label {
 
 .gmitem{
     width :100%;
+    flex-direction: row;
+    height: 32px; 
+    justify-content: flex-end;
 }

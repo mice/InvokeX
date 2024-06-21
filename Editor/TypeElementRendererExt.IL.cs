@@ -1,10 +1,12 @@
-﻿using ILRuntime.CLR.TypeSystem;
+﻿#if !DISABLE_ILRUNTIME
+using ILRuntime.CLR.TypeSystem;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
+
 
 public static partial class TypeElementRendererExt
 {
@@ -21,6 +23,7 @@ public static partial class TypeElementRendererExt
 
             var fieldCount = ilType.TotalFieldCount;
 
+            
             for (int i = 0; i < fieldCount; i++)
             {
                 var tmpFieldType = ilType.GetField(i, out var fd);
@@ -241,3 +244,4 @@ public static partial class TypeElementRendererExt
         return renderer;
     }
 }
+#endif

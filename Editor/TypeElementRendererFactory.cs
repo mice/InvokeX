@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 
-public class TypeElementRendererFactory:IElementRendererFactory
+public class TypeElementRendererFactory
 {
-    public Dictionary<Type, System.Func<System.Type, string, TypeElementRenderer>> creatorDict { get; private set; } = new Dictionary<Type, Func<System.Type, string, TypeElementRenderer>>();
+    private Dictionary<Type, System.Func<System.Type, string, TypeElementRenderer>> creatorDict = new Dictionary<Type, Func<System.Type, string, TypeElementRenderer>>();
+
 
     public TypeElementRendererFactory Init()
     {
@@ -33,8 +34,9 @@ public class TypeElementRendererFactory:IElementRendererFactory
         RegisterType(typeof(System.Collections.Generic.List<>), TypeElementRendererExt.ListRenderer);
         RegisterType(typeof(UnityEngine.Object), TypeElementRendererExt.UObjectRenderer);
         RegisterType(typeof(IParamData), TypeElementRendererExt.IParamDataRenderer);
-
+#if !DISABLE_ILRUNTIME
         RegisterType(typeof(ILRuntime.Runtime.Intepreter.ILTypeInstance), TypeElementRendererExt.ILTypeRender);
+#endif
         return this;
     }
 
@@ -101,7 +103,7 @@ public class TypeElementRendererFactory:IElementRendererFactory
                 return uObjCreator.Invoke(type, label);
             }
         }
-
+#if !DISABLE_ILRUNTIME
         if (type.UnderlyingSystemType == typeof(ILRuntime.Runtime.Intepreter.ILTypeInstance))
         {
             if (creatorDict.TryGetValue(typeof(ILRuntime.Runtime.Intepreter.ILTypeInstance), out var uObjCreator))
@@ -114,6 +116,7 @@ public class TypeElementRendererFactory:IElementRendererFactory
         var ilRuntimeTypeType = typeof(ILRuntime.Reflection.ILRuntimeType);
         var ilInstType = typeof(ILRuntime.Runtime.Intepreter.ILTypeInstance);
         UnityEngine.Debug.LogError($"type:{type},ilType:{ilTypeType},ilRuntimeType:{ilRuntimeTypeType},ilInstType:{ilInstType}");
+#endif
         return null;
     }
 }
