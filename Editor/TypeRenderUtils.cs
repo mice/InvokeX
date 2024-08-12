@@ -13,6 +13,12 @@ public static partial class TypeRenderUtils
         //TypeElementRenderer.factory = factory;
     }
 
+    public static void Init()
+    {
+        factory = new TypeElementRendererFactory().Init();
+        TypeElementRendererExt.factory = factory;
+    }
+
     public static void RenderParams(ScrollView selectItemViews, ParameterInfo[] parameterInfos,string methodName = "UnNamed")
     {
         selectItemViews.Clear();

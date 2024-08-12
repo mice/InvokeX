@@ -63,6 +63,10 @@ public class TypeElementRendererFactory
                 {
                     return arrayCreator.Invoke(type, label);
                 }
+                else
+                {
+                    UnityEngine.Debug.LogError($"OnlySupport:Array[T];{type}:{type.FullName}:tmpType:{subType};;;;{subType} == {type}");
+                }
             }
         }
 
@@ -76,6 +80,10 @@ public class TypeElementRendererFactory
                 if (creatorDict.TryGetValue(genericListType, out var arrayCreator))
                 {
                     return arrayCreator.Invoke(type, label);
+                }
+                else
+                {
+                    UnityEngine.Debug.LogError($"OnlySupport:List<T>;{type}:{type.FullName}:tmpType:{genericListType};;;;{targetType} == {type}");
                 }
             }
             else
