@@ -69,8 +69,13 @@ public class CallDataProvider
         AddILTab("CollectMethods", tabs, tabTypes);
         tabTypes[tabTypes.Count - 1] = true;
 
-        tabs.AddRange(typeDict.Keys);
-        tabTypes.Add(true);
+       
+        foreach(var item in typeDict.Keys)
+        {
+            tabs.Add(item);
+            tabTypes.Add(true);
+        }
+        
 
         AddILTab("Protocal", tabs, tabTypes);
         AddILTab("ViewUtils", tabs, tabTypes);
