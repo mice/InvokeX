@@ -128,7 +128,7 @@ public class ILRuntimeCallManager
         }
     }
 
-    public void GetCollectMethodDictionary(SerDict<string, (string, string,bool)> methodDict, Dictionary<string, IMethod> typeDict)
+    public void GetCollectMethodDictionary(SerDict<string, KVPair> methodDict, Dictionary<string, IMethod> typeDict)
     {
         var logMethName = string.Empty;
 

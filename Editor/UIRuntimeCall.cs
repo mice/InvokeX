@@ -189,16 +189,6 @@ public class UIRuntimeCallV : EditorWindow
             list.Add(new MethodIL(item));
         }
 #endif
-        list.Sort((a,b)=> {
-
-            var aWeight = collectMgr.ReverseKeys[a.Name];
-            var bWeight = collectMgr.ReverseKeys[b.Name];
-
-            var aWeightValue = collectMgr.SaveKeys.IndexOf(aWeight);
-            var bWeightValue = collectMgr.SaveKeys.IndexOf(bWeight);
-
-            return aWeightValue > bWeightValue ? 1:-1;
-        });
     }
 
 #if !DISABLE_ILRUNTIME
@@ -274,7 +264,7 @@ public class UIRuntimeCallV : EditorWindow
 #endif
             if(target is IMethodInfoData methodInfo)
             {
-               
+                scrollView.Clear();
                 if (methodInfo.ParamCount > 0)
                 {
                     var collectCallMgr = CollectCallManager.Instance;

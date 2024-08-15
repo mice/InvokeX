@@ -4,7 +4,7 @@ using UnityEngine;
 [System.Serializable]
 public class CollectData
 {
-    [SerializeField] public SerDict<string, (string,string,bool)> MethodParameters = new SerDict<string, (string, string,bool)>();
+    [SerializeField] public SerDict<string, KVPair> MethodParameters = new SerDict<string, KVPair>();
 
     public bool  ContainsMethod(string methodName) {
         return MethodParameters.ContainsKey(methodName);
@@ -12,10 +12,10 @@ public class CollectData
 
     public void AddMethodAndParameters(string methodName,string typeName, string parameters,bool isIL) {
         if (!MethodParameters.ContainsKey(methodName))
-            MethodParameters.Add(methodName, (typeName, parameters, isIL));
+            MethodParameters.Add(methodName, new KVPair(typeName, parameters, isIL));
         else
         {
-            MethodParameters[methodName] = (typeName, parameters, isIL);
+            MethodParameters[methodName] = new KVPair(typeName, parameters, isIL);
         }
     }
 
@@ -25,6 +25,24 @@ public class CollectData
         else
             Debug.LogError($"MethodParameters is not Contains {methodName} ");
     }
+
+    public void FromStringData(string content)
+    {
+        try
+        {
+            MethodParameters = JsonUtility.FromJson<SerDict<string, KVPair>>(content);
+        }catch(System.Exception exc)
+        {
+            UnityEngine.Debug.LogError(exc.Message);
+            MethodParameters = new SerDict<string, KVPair>();
+        }
+    }
+
+    public string ToJsonData()
+    {
+        var content = JsonUtility.ToJson(MethodParameters);
+        return content;
+    }
 }
 
 [System.Serializable]
@@ -32,6 +50,16 @@ public class KVPair
 {
     public string key;
     public string value;
+    public bool isil;
+    public string Item1 => key;
+    public string Item2 => value;
+    public bool Item3 => isil;
+    public KVPair(string key,string value, bool isil)
+    {
+        this.key = key;
+        this.value = value;
+        this.isil = isil;
+    }
 }
 
 
