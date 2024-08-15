@@ -8,18 +8,6 @@ using System.Reflection;
 
 public class UIRuntimeCallV : EditorWindow
 {
-    [MenuItem("Window/UIElements/UIRuntimeCallX(Ctrl+Alt+G) %&G")]
-    public static void ShowExample()
-    {
-        var wnd = EditorWindow.GetWindow<UIRuntimeCallV>(true, nameof(UIRuntimeCallV));
-        TypeRenderUtils.Register<MethodCLR>(NativeTypeElementRegister.Instance , new CLRMethodRender(null));
-#if !DISABLE_ILRUNTIME
-        TypeRenderUtils.Register<MethodIL>(ILTypeElementRegister.Instance, new ILMethodRender(null));
-#endif
-        TypeRenderUtils.Init();
-        wnd.minSize = new Vector2(1200, 300);
-    }
-
     private TabbedMenuController menuController;
     private StyleSheet styleSheet;
     ContainerData<IMethodInfoData> CacheContainer = null;
