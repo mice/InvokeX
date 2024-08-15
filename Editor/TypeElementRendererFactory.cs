@@ -2,60 +2,13 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-public class NativeTypeElementRegister : ITypeElementRegister
-{
-    public static NativeTypeElementRegister Instance { get; private set; } = new NativeTypeElementRegister(); 
-    public void Register(ITypeElementRendererFactory factory,Action<Type, System.Func<System.Type, string, TypeElementRenderer>> RegisterType)
-    {
-        TypeElementRendererExt.factory = factory;
-        RegisterType(typeof(sbyte), TypeElementRendererExt.ByteRenderer);
-        RegisterType(typeof(byte), TypeElementRendererExt.UByteRenderer);
-        RegisterType(typeof(short), TypeElementRendererExt.ShortRenderer);
-        RegisterType(typeof(ushort), TypeElementRendererExt.UShortRenderer);
-        RegisterType(typeof(int), TypeElementRendererExt.IntRenderer);
-        RegisterType(typeof(uint), TypeElementRendererExt.UIntRenderer);
-        RegisterType(typeof(long), TypeElementRendererExt.LongRenderer);
-        RegisterType(typeof(ulong), TypeElementRendererExt.ULongRenderer);
-        RegisterType(typeof(float), TypeElementRendererExt.FloatRenderer);
-        RegisterType(typeof(double), TypeElementRendererExt.DoubleRenderer);
-        RegisterType(typeof(bool), TypeElementRendererExt.BoolRenderer);
-        RegisterType(typeof(string), TypeElementRendererExt.StringRenderer);
-
-        RegisterType(typeof(UnityEngine.Color), TypeElementRendererExt.ColorRenderer);
-        RegisterType(typeof(UnityEngine.Vector2), TypeElementRendererExt.Vec2Renderer);
-        RegisterType(typeof(UnityEngine.Vector2Int), TypeElementRendererExt.Vec2IntRenderer);
-        RegisterType(typeof(UnityEngine.Vector3), TypeElementRendererExt.Vec3Renderer);
-        RegisterType(typeof(UnityEngine.Vector3Int), TypeElementRendererExt.Vec3IntRenderer);
-        RegisterType(typeof(UnityEngine.Vector4), TypeElementRendererExt.Vec4Renderer);
-        RegisterType(typeof(UnityEngine.Rect), TypeElementRendererExt.RectRenderer);
-        RegisterType(typeof(UnityEngine.RectInt), TypeElementRendererExt.RectIntRenderer);
-
-        RegisterType(typeof(System.Array), TypeElementRendererExt.ArrayRenderer);
-        RegisterType(typeof(System.Collections.Generic.List<>), TypeElementRendererExt.ListRenderer);
-        RegisterType(typeof(UnityEngine.Object), TypeElementRendererExt.UObjectRenderer);
-        RegisterType(typeof(IParamData), TypeElementRendererExt.IParamDataRenderer);
-    }
-}
 
 
 public class TypeElementRendererFactory:ITypeElementRendererFactory
 {
     private Dictionary<Type, System.Func<System.Type, string, TypeElementRenderer>> creatorDict = new Dictionary<Type, Func<System.Type, string, TypeElementRenderer>>();
-    private List<ITypeElementRegister> typeElementRegisters = new List<ITypeElementRegister>();
-    public TypeElementRendererFactory Register(ITypeElementRegister typeElementRegister)
-    {
-        if (!typeElementRegisters.Contains(typeElementRegister))
-        {
-            typeElementRegisters.Add(typeElementRegister);
-        }
-        else
-        {
-            UnityEngine.Debug.LogWarning("Dup Add!");
-        }
-        return this;
-    }
 
-    public TypeElementRendererFactory Init()
+    public TypeElementRendererFactory Init(List<ITypeElementRegister> typeElementRegisters)
     {
         if (typeElementRegisters.Count == 0)
         {
@@ -65,10 +18,6 @@ public class TypeElementRendererFactory:ITypeElementRendererFactory
         {
             typeElementRegister.Register(this, RegisterType);
         }
-
-#if !DISABLE_ILRUNTIME
-        RegisterType(typeof(ILRuntime.Runtime.Intepreter.ILTypeInstance), TypeElementRendererExt.ILTypeRender);
-#endif
         return this;
     }
 

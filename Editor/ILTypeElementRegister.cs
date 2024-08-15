@@ -8,8 +8,16 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 
-public static partial class TypeElementRendererExt
+public partial class ILTypeElementRegister:ITypeElementRegister
 {
+    public static ITypeElementRendererFactory factory;
+    public void Register(ITypeElementRendererFactory factory, Action<Type, Func<Type, string, TypeElementRenderer>> register)
+    {
+        ILTypeElementRegister.factory = factory;
+        register(typeof(ILRuntime.Runtime.Intepreter.ILTypeInstance), ILTypeElementRegister.ILTypeRender);
+
+    }
+
     public static TypeElementRenderer ILTypeRender(System.Type parameterType, string paramName)
     {
         var renderer = new TypeElementRenderer();
@@ -243,5 +251,7 @@ public static partial class TypeElementRendererExt
         };
         return renderer;
     }
+
+   
 }
 #endif

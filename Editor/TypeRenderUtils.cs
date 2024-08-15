@@ -8,13 +8,25 @@ using UnityEngine.UIElements;
 
 public static partial class TypeRenderUtils
 {
-    private static TypeElementRendererFactory factory = new TypeElementRendererFactory().Init();
-
+    private static TypeElementRendererFactory factory = new TypeElementRendererFactory().Init(typeElementRegisters);
+    private static List<ITypeElementRegister> typeElementRegisters = new List<ITypeElementRegister>();
     public static void Init()
     {
         factory = new TypeElementRendererFactory()
-            .Register(new NativeTypeElementRegister())
-            .Init();
+            .Init(typeElementRegisters);
+    }
+
+    
+    public static void Register(ITypeElementRegister typeElementRegister)
+    {
+        if (!typeElementRegisters.Contains(typeElementRegister))
+        {
+            typeElementRegisters.Add(typeElementRegister);
+        }
+        else
+        {
+            UnityEngine.Debug.LogWarning("Dup Add!");
+        }
     }
 
     public static void RenderParams(ScrollView selectItemViews, ParameterInfo[] parameterInfos,string methodName = "UnNamed")

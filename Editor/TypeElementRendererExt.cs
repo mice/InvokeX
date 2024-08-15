@@ -6,10 +6,8 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 
-
 public static partial class TypeElementRendererExt
 {
-
     public static TypeElementRenderer ByteRenderer(System.Type targetType, string paramName)
     {
         var renderer = new TypeElementRenderer();
@@ -401,9 +399,6 @@ public static partial class TypeElementRendererExt
         };
         return renderer;
     }
-
-    
-
 
     public static ITypeElementRendererFactory factory;
 }
