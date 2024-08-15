@@ -6,7 +6,6 @@ using UnityEngine.UIElements;
 public class CLRMethodRender : IMethodRender
 {
     public ITypeElementRendererFactory Factory { get; set; }
-    private ITypeElementRendererFactory factory => Factory;
     public CLRMethodRender(ITypeElementRendererFactory factory)
     {
         this.Factory = factory;

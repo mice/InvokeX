@@ -170,9 +170,6 @@ public class UIRuntimeCallV : EditorWindow
     private void GetCollectMethod(string typeName,List<IMethodInfoData> list)
     {
         var targetMgr = RuntimeCallManager.Instance;
-#if !DISABLE_ILRUNTIME
-        var ilTargetMgr = ILRuntimeCallManager.Instance;
-#endif
         var collectMgr = CollectCallManager.Instance;
 
         var methodTable = new Dictionary<string, MethodBase>();
@@ -183,6 +180,7 @@ public class UIRuntimeCallV : EditorWindow
             list.Add(new MethodCLR(item));
         }
 #if !DISABLE_ILRUNTIME
+        var ilTargetMgr = ILRuntimeCallManager.Instance;
         var ilMethodTable = new Dictionary<string, ILRuntime.CLR.Method.IMethod>();
         ilTargetMgr.GetCollectMethodDictionary(collectMgr.CollectData.MethodParameters, ilMethodTable);
 
