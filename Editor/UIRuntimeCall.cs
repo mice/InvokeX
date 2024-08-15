@@ -59,9 +59,9 @@ public class UIRuntimeCallV : EditorWindow
         for (int i = 0; i < tabType.Count; i++)
         {
 
-            if (i!=0 && tabType[i])
+            if (i != 0 && tabType[i])
             {
-                  new ContainerData<MethodCLR>(styleSheet, OnSelectItem).InitContainer(root, tabs[i], GetCLR);
+                new ContainerData<MethodCLR>(styleSheet, OnSelectItem).InitContainer(root, tabs[i], GetCLR);
             }
             else if (i == 0 && tabType[i])
             {
@@ -70,7 +70,7 @@ public class UIRuntimeCallV : EditorWindow
             else
             {
 #if !DISABLE_ILRUNTIME
-                  new ContainerData<MethodIL>(styleSheet, OnSelectItem).InitContainer(root, tabs[i], GetIL);
+                new ContainerData<MethodIL>(styleSheet, OnSelectItem).InitContainer(root, tabs[i], GetIL);
 #endif
             }
         }
@@ -233,42 +233,23 @@ public class UIRuntimeCallV : EditorWindow
                 }
             }
 #endif
-            if (target is MethodCLR methodCLR)
+            if(target is IMethodInfoData methodInfo)
             {
-                if (methodCLR.ParamCount > 0)
+                if (methodInfo.ParamCount > 0)
                 {
-                    TypeRenderUtils.RenderMethod(scrollView, methodCLR);
+                    TypeRenderUtils.RenderMethod(scrollView, methodInfo);
                 }
 
                 var button = new Button();
                 button.text = "Submit";
-                button.clicked += () => OnClickSubmit(tab, methodCLR);
+                button.clicked += () => OnClickSubmit(tab, methodInfo);
                 scrollView.Insert(0, button);
 
                 var collectButton = new Button();
                 collectButton.text = "Collect";
-                collectButton.clicked += () => OnClickCollectMethoed(tab, methodCLR);
+                collectButton.clicked += () => OnClickCollectMethoed(tab, methodInfo);
                 scrollView.Insert(0, collectButton);
             }
-#if !DISABLE_ILRUNTIME
-            else if (target is MethodIL methodIL)
-            {
-                if (methodIL.ParamCount > 0)
-                {
-                    TypeRenderUtils.RenderILParams(scrollView, methodIL.Data.Parameters);
-                }
-
-                var button = new Button();
-                button.text = "Submit";
-                button.clicked += () => OnClickSubmit(tab, methodIL);
-                scrollView.Insert(0, button);
-
-                var collectButton = new Button();
-                collectButton.text = "Collect";
-                collectButton.clicked += () => OnClickCollectMethoed(tab, methodIL);
-                scrollView.Insert(0, collectButton);
-            }
-#endif
         }
     }
 
@@ -288,53 +269,27 @@ public class UIRuntimeCallV : EditorWindow
                 }
             }
 #endif
-            if (target is MethodCLR methodCLR)
+            if(target is IMethodInfoData methodInfo)
             {
-                if (methodCLR.ParamCount > 0)
+               
+                if (methodInfo.ParamCount > 0)
                 {
                     var collectCallMgr = CollectCallManager.Instance;
                     object[] Params = new object[0];
-                    if (collectCallMgr.CollectData.ContainsMethod(methodCLR.Name))
+                    if (collectCallMgr.CollectData.ContainsMethod(methodInfo.Name))
                     {
-                        Params = methodCLR.FromJson(collectCallMgr.CollectData.MethodParameters[methodCLR.Name].Item2);
+                        Params = methodInfo.FromJson(collectCallMgr.CollectData.MethodParameters[methodInfo.Name].Item2);
                     }
-                    TypeRenderUtils.RenderMethodAndParams(scrollView, methodCLR, Params);
+
+                    TypeRenderUtils.RenderMethodAndParams(scrollView, methodInfo, Params);
                 }
-                else
-                {
-                    scrollView.Clear();
-                }
+
 
                 var button = new Button();
                 button.text = "Submit";
-                button.clicked += () => OnClickCollectSubmit(tab, methodCLR);
+                button.clicked += () => OnClickCollectSubmit(tab, methodInfo);
                 scrollView.Insert(0, button);
             }
-
-#if !DISABLE_ILRUNTIME
-            else if (target is MethodIL methodIL)
-            {
-                if (methodIL.ParamCount > 0)
-                {
-                    var collectCallMgr = CollectCallManager.Instance;
-                    object[] Params = new object[0];
-                    if (collectCallMgr.CollectData.ContainsMethod(methodIL.Name))
-                    {
-                        Params = methodIL.FromJson(collectCallMgr.CollectData.MethodParameters[methodIL.Name].Item2);
-                    }
-                    TypeRenderUtils.RenderSetILParams(scrollView, methodIL.Data.Parameters, Params);
-                }
-                else
-                {
-                    scrollView.Clear();
-                }
-
-                var button = new Button();
-                button.text = "Submit";
-                button.clicked += () => OnClickCollectSubmit(tab, methodIL);
-                scrollView.Insert(0, button);
-            }
-#endif
         }
     }
 

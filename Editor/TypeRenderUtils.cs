@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor.UIElements;
-using UnityEngine;
 using UnityEngine.UIElements;
+using static UnityEngine.GraphicsBuffer;
 
 
 public static partial class TypeRenderUtils
 {
-    private static TypeElementRendererFactory factory = new TypeElementRendererFactory().Init(typeElementRegisters);
     private static List<ITypeElementRegister> typeElementRegisters = new List<ITypeElementRegister>();
+    private static TypeElementRendererFactory factory = new TypeElementRendererFactory().Init(typeElementRegisters);
     public static void Init()
     {
         factory = new TypeElementRendererFactory()
@@ -55,38 +54,78 @@ public static partial class TypeRenderUtils
 
     }
 
-    public static void RenderLogParams(ScrollView selectItemViews, object[] Params) {
+    /// <summary>
+    /// TODO---------fix
+    /// 先苟且一下.
+    /// 难用当前type确定.最好是在ParamRendererContainer里面提供信息.
+    /// </summary>
+    /// <param name="selectItemViews"></param>
+    /// <param name="parameterInfos"></param>
+    /// <param name="Params"></param>
+    public static void RenderLogParams(ScrollView selectItemViews, ParameterInfo[] parameterInfos, object[] Params) {
         var children= selectItemViews.Children();
         int i = 0;
+        var dd = selectItemViews.userData as ParamRendererContainer;
+
+        var tmpTextBaseType = typeof(TextValueField<>);
         foreach (var child in children)
         {
-            int num = 0;
-            var strParams= Params[i].ToString();
-            if (int.TryParse(strParams, out num))
+            var strParams = Params[i].ToString();
+            var tmpType = parameterInfos[i].GetType();
+            var viewType = child.GetType();
+            var ddsub = dd.list[i];
+               
+            if(child is UnityEngine.UIElements.TextField textField)
             {
-                var intField = child as UnityEditor.UIElements.IntegerField;
+                textField.value = strParams;
+            }else if (child is UnityEditor.UIElements.IntegerField intField)
+            {
+                int.TryParse(strParams, out var num);
                 intField.value = num;
             }
-            else
-            {
-                var textField = child as UnityEngine.UIElements.TextField;
-                textField.value = strParams;
-            }
-            
             i += 1;
         }
     }
 
-    public static void RenderMethod(ScrollView selectItemViews, MethodCLR method)
+    private static void RenderCLRMethod(ScrollView selectItemViews, MethodCLR method)
     {
         ParameterInfo[] parameterInfos = method.GetParameters();
         RenderParams(selectItemViews, parameterInfos);
     }
 
-    public static void RenderMethodAndParams(ScrollView selectItemViews, MethodCLR method,object[] Parameters)
+    private static void RenderClrMethodAndParams(ScrollView selectItemViews, MethodCLR method,object[] Parameters)
     {
         ParameterInfo[] parameterInfos = method.GetParameters();
         RenderParams(selectItemViews, parameterInfos);
-        RenderLogParams(selectItemViews, Parameters);
+        RenderLogParams(selectItemViews,parameterInfos, Parameters);
+    }
+
+    public static void RenderMethod(ScrollView selectItemViews, IMethodInfoData method)
+    {
+        if (method is MethodCLR methodCLR)
+        {
+            TypeRenderUtils.RenderCLRMethod(selectItemViews, methodCLR);
+        }
+#if !DISABLE_ILRUNTIME
+        else if (method is MethodIL methodIL)
+        {
+
+            TypeRenderUtils.RenderILParams(selectItemViews, methodIL.Data.Parameters);
+        }
+#endif
+    }
+
+    public static void RenderMethodAndParams(ScrollView selectItemViews, IMethodInfoData method, object[] Parameters)
+    {
+        if (method is MethodCLR methodCLR)
+        {
+            TypeRenderUtils.RenderClrMethodAndParams(selectItemViews, methodCLR, Parameters);
+        }
+#if !DISABLE_ILRUNTIME
+        else if (method is MethodIL methodIL)
+        {
+            TypeRenderUtils.RenderSetILParams(selectItemViews, methodIL.Data.Parameters, Parameters);
+        }
+#endif
     }
 }
