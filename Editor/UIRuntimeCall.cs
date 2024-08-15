@@ -157,25 +157,12 @@ public class UIRuntimeCallV : EditorWindow
 
     private void GetCollectMethod(string typeName,List<IMethodInfoData> list)
     {
-        var targetMgr = RuntimeCallManager.Instance;
         var collectMgr = CollectCallManager.Instance;
 
-        var methodTable = new Dictionary<string, MethodBase>();
-        targetMgr.GetCollectMethodDictionary( collectMgr.CollectData.MethodParameters, methodTable);
-
-        foreach (var item in methodTable.Values)
-        {
-            list.Add(new MethodCLR(item));
-        }
+        RuntimeCallManager.Instance.GetCollectMethodDictionary(collectMgr.CollectData.MethodParameters, list);
+    
 #if !DISABLE_ILRUNTIME
-        var ilTargetMgr = ILRuntimeCallManager.Instance;
-        var ilMethodTable = new Dictionary<string, ILRuntime.CLR.Method.IMethod>();
-        ilTargetMgr.GetCollectMethodDictionary(collectMgr.CollectData.MethodParameters, ilMethodTable);
-
-        foreach (var item in ilMethodTable.Values)
-        {
-            list.Add(new MethodIL(item));
-        }
+        ILRuntimeCallManager.Instance.GetCollectMethodDictionary(collectMgr.CollectData.MethodParameters, list);
 #endif
     }
 
@@ -301,29 +288,24 @@ public class UIRuntimeCallV : EditorWindow
                 if (scrollView.userData != null && scrollView.userData is ParamRendererContainer renderContainer)
                     arr = MakeParams(target, renderContainer);
 
+                var typeName = target.TargetTypeName;
+
                 //var arr = MakeParams(target, renderContainer);
                 if (target is MethodCLR method)
                 {
-                    var collectCallManager = CollectCallManager.Instance;
-                    var typeName = method.Data.DeclaringType.Name;
                     RuntimeCallManager.Instance.Invoke(typeName, method.Name, arr);
 
-                    var parametersStr = method.ToJson(arr);
-                    collectCallManager.AddCollectMethod(method.Name, typeName, parametersStr,false);
                 }
 #if !DISABLE_ILRUNTIME
                 else if (target is MethodIL methodYYY)
                 {
-                    var mgr = ILRuntimeCallManager.Instance;
-                    mgr.Invoke(sub, methodYYY.Name, arr);
-
-                    var collectCallManager = CollectCallManager.Instance;
-                    var typeName = methodYYY.Data.DeclearingType.Name;
-
-                    var parametersStr = methodYYY.ToJson(arr);
-                    collectCallManager.AddCollectMethod(methodYYY.Name, typeName, parametersStr,true);
+                    ILRuntimeCallManager.Instance.Invoke(sub, methodYYY.Name, arr);
                 }
 #endif
+
+                var parametersStr = target.ToJson(arr);
+                var collectCallManager = CollectCallManager.Instance;
+                collectCallManager.AddCollectMethod(target.Name, typeName, parametersStr, target.TypeName);
             }
         }catch(Exception exce)
         {
@@ -342,31 +324,25 @@ public class UIRuntimeCallV : EditorWindow
                 object [] arr =Array.Empty<object>();
                 if (scrollView.userData!=null && scrollView.userData is ParamRendererContainer renderContainer)
                      arr = MakeParams(target, renderContainer);
-                
+
+                var collectCallManager = CollectCallManager.Instance;
+                var methodName = target.Name;
+                var typeName = collectCallManager.CollectData.MethodParameters[methodName].Item1;
+
+                var parametersStr = target.ToJson(arr);
+                collectCallManager.AddCollectMethod(methodName, typeName, parametersStr, target.TypeName);
+
                 if (target is MethodCLR method)
                 {
-                    var collectCallManager = CollectCallManager.Instance;
-                    var typeName = collectCallManager.CollectData.MethodParameters[method.Name].Item1;
-
-                    var parametersStr = method.ToJson(arr);
-                    collectCallManager.AddCollectMethod(method.Name, typeName, parametersStr,false);
-
-                    RuntimeCallManager.Instance.Invoke(typeName, method.Name, arr);
+                    RuntimeCallManager.Instance.Invoke(typeName, methodName, arr);
                 }
 #if !DISABLE_ILRUNTIME
                 else if (target is MethodIL methodYYY)
                 {
-                    var collectCallManager = CollectCallManager.Instance;
-                    var typeName = collectCallManager.CollectData.MethodParameters[methodYYY.Name].Item1;
-
-                    var parametersStr = methodYYY.ToJson(arr);
-                    collectCallManager.AddCollectMethod(methodYYY.Name, typeName, parametersStr,true);
-
                     if (string.Equals(typeName, "CPlayerMsgCallerProxy"))
                         typeName = "Protocal";
 
-                    var mgr = ILRuntimeCallManager.Instance;
-                    mgr.Invoke(typeName, methodYYY.Name, arr);
+                    ILRuntimeCallManager.Instance.Invoke(typeName, methodYYY.Name, arr);
                 }
 #endif
             }
@@ -389,18 +365,10 @@ public class UIRuntimeCallV : EditorWindow
                      arr = MakeParams(target, renderContainer);
 
                 var collectCallManager = CollectCallManager.Instance;
-                var typeName = target.Name;
+                var typeName = target.TargetTypeName;
                 var parametersStr = target.ToJson(arr);
-                if (target is MethodCLR method)
-                {
-                    collectCallManager.CollectMethod(method.Name, typeName, parametersStr,false);
-                }
-#if !DISABLE_ILRUNTIME
-                else if (target is MethodIL methodYYY)
-                {
-                    collectCallManager.CollectMethod(methodYYY.Name, typeName, parametersStr,true);
-                }
-#endif
+               
+                collectCallManager.CollectMethod(target.Name, typeName, parametersStr, target.TypeName);
             }
         }
         catch (Exception exce)
@@ -433,57 +401,6 @@ public class UIRuntimeCallV : EditorWindow
     }
 }
 
-public class MethodCLR : IMethodInfoData
-{
-    public string Name => Data.Name;
-    public int ParamCount { get; private set; }
-    public MethodBase Data;
-
-    public MethodCLR(MethodBase method) {
-        this.Data = method;
-        this.ParamCount = method.GetParameters().Length;
-    }
-
-    public ParameterInfo[] GetParameters()
-    {
-        return Data.GetParameters();
-    }
-
-    public string ToJson(object[] arr)
-    {
-        if (arr.Length > 0)
-        {
-            SerDict<string, string> data = new SerDict<string,string>();
-            var infos = Data.GetParameters();
-            for (int i = 0; i < arr.Length; i++)
-            {
-                data[infos[i].Name] = arr[i].ToString();
-            }
-
-            var content = JsonUtility.ToJson(data);;
-            return content;
-        }
-
-        return string.Empty;
-    }
-
-    public object[] FromJson(string stringObjs)
-    {
-        object[] objs = new object[0]; 
-        if (!string.IsNullOrEmpty(stringObjs))
-        {
-            SerDict<string,string> data = JsonUtility.FromJson<SerDict<string,string>>(stringObjs);
-            objs = new object[data.Count];
-            var infos = Data.GetParameters();
-            for (int i = 0; i < data.Count; i++)
-            {
-                objs[i] = data[infos[i].Name] as object;
-            }
-        }
-
-        return objs;
-    }
-}
 
 
 public class ContainerData<T>
@@ -705,15 +622,16 @@ public class ContainerData<T>
         var index = System.Convert.ToInt32(((VisualElement)(e.currentTarget)).userData);
         if (index < list.Count)
         {
-            if(list[index] is MethodCLR methodCLR)
+            var methodInfo = list[index];
+            var typeName = methodInfo.TypeName;
+            var collectCallManager = CollectCallManager.Instance;
+            collectCallManager.AddCollectMethod(methodInfo.Name, methodInfo.TargetTypeName, string.Empty, typeName);
+
+            if (string.Equals(typeName, "CPlayerMsgCallerProxy"))
+                typeName = "Protocal";
+
+            if (list[index] is MethodCLR methodCLR)
             {
-                var typeName = methodCLR.Data.DeclaringType.Name;
-                var collectCallManager = CollectCallManager.Instance;
-                collectCallManager.AddCollectMethod(methodCLR.Name, typeName, string.Empty,false);
-
-                if (string.Equals(typeName, "CPlayerMsgCallerProxy"))
-                    typeName = "Protocal";
-
                 var targetMgr = RuntimeCallManager.Instance;
                 targetMgr.Invoke(typeName, methodCLR.Name, Array.Empty<object>());
 
@@ -721,14 +639,7 @@ public class ContainerData<T>
 #if !DISABLE_ILRUNTIME
             else if(list[index] is MethodIL methodIL)
             {
-                var typeName = methodIL.Data.DeclearingType.Name;
-                var collectCallManager = CollectCallManager.Instance;
                 var mgr = ILRuntimeCallManager.Instance;
-                collectCallManager.AddCollectMethod(methodIL.Name, typeName, string.Empty, true);
-
-                if (string.Equals(typeName, "CPlayerMsgCallerProxy"))
-                    typeName = "Protocal";
-
                 mgr.Invoke(typeName, methodIL.Name);
             }
 #endif
@@ -739,20 +650,10 @@ public class ContainerData<T>
         var index = System.Convert.ToInt32(((VisualElement)(eventBase.currentTarget)).userData);
         if (index < list.Count)
         {
-            if (list[index] is MethodCLR methodCLR)
-            {
-                var typeName= methodCLR.Data.DeclaringType.Name;
-                var collectCallManager = CollectCallManager.Instance;
-                collectCallManager.CollectMethod(methodCLR.Name, typeName, string.Empty , false);
-            }
-#if !DISABLE_ILRUNTIME
-            else if (list[index] is MethodIL methodIL)
-            {
-                var typeName = methodIL.Data.DeclearingType.Name;
-                var collectCallManager = CollectCallManager.Instance;
-                collectCallManager.CollectMethod(methodIL.Name, typeName, string.Empty, true);
-            }
-#endif
+            var methodInfo = list[index];
+            var typeName = methodInfo.TargetTypeName;
+
+            CollectCallManager.Instance.CollectMethod(methodInfo.Name, typeName, string.Empty, methodInfo.TypeName);
         }
     }
 
@@ -761,33 +662,14 @@ public class ContainerData<T>
         var index = System.Convert.ToInt32(((VisualElement)(eventBase.currentTarget)).userData);
         if (index < list.Count)
         {
-            if (list[index] is MethodCLR methodCLR)
+            VisualElement rootVisualElement = rootVE;
+            var scrollView = rootVE.Q<ScrollView>("typeContainer");
+            if (scrollView != null)
             {
-                VisualElement rootVisualElement = rootVE;
-                var scrollView = rootVE.Q<ScrollView>("typeContainer");
-                if (scrollView != null)
-                {
-                    scrollView.Clear();
-                }
-
-                var collectCallManager = CollectCallManager.Instance;
-                collectCallManager.DeleteCollectMethod(methodCLR.Name);
-               
+                scrollView.Clear();
             }
-#if !DISABLE_ILRUNTIME
-            else if (list[index] is MethodIL methodIL)
-            {
-                VisualElement rootVisualElement = rootVE;
-                var scrollView = rootVE.Q<ScrollView>("typeContainer");
-                if (scrollView != null)
-                {
-                    scrollView.Clear();
-                }
-
-                var collectCallManager = CollectCallManager.Instance;
-                collectCallManager.DeleteCollectMethod(methodIL.Name);
-            }
-#endif
+            
+            CollectCallManager.Instance.DeleteCollectMethod(list[index].Name);
         }
     }
 
@@ -797,91 +679,5 @@ public class ContainerData<T>
         {
             OnSelectItem?.Invoke(this.tab,obj);
         }
-    }
-}
-
-public class TabbedMenuController
-{
-    /* Define member variables*/
-    private const string tabClassName = "tab";
-    private const string currentlySelectedTabClassName = "currentlySelectedTab";
-    private const string unselectedContentClassName = "unselectedContent";
-    // Tab and tab content have the same prefix but different suffix
-    // Define the suffix of the tab name
-    private const string tabNameSuffix = "Tab";
-    // Define the suffix of the tab content name
-    private const string contentNameSuffix = "Content";
-
-    private readonly VisualElement root;
-
-    public TabbedMenuController(VisualElement root)
-    {
-        this.root = root;
-    }
-
-    public void RegisterTabCallbacks()
-    {
-        UQueryBuilder<Button> tabs = GetAllTabs();
-        tabs.ForEach((Button tab) =>
-        {
-            tab.RegisterCallback<MouseUpEvent>(TabOnClick);
-        });
-    }
-
-    /* Method for the tab on-click event: 
-       - If it is not selected, find other tabs that are selected, unselect them 
-       - Then select the tab that was clicked on
-    */
-    private void TabOnClick(MouseUpEvent evt)
-    {
-        Button clickedTab = evt.currentTarget as Button;
-        if (!TabIsCurrentlySelected(clickedTab))
-        {
-            GetAllTabs().Where(
-                (tab) => tab != clickedTab && TabIsCurrentlySelected(tab)
-            ).ForEach(UnselectTab);
-            SelectTab(clickedTab);
-        }
-    }
-
-    //Method that returns a Boolean indicating whether a tab is currently selected
-    private static bool TabIsCurrentlySelected(Button tab)
-    {
-        return tab.ClassListContains(currentlySelectedTabClassName);
-    }
-
-    private UQueryBuilder<Button> GetAllTabs()
-    {
-        return root.Query<Button>(className: tabClassName);
-    }
-
-    /* Method for the selected tab: 
-       -  Takes a tab as a parameter and adds the currentlySelectedTab class
-       -  Then finds the tab content and removes the unselectedContent class */
-    private void SelectTab(Button tab)
-    {
-        tab.AddToClassList(currentlySelectedTabClassName);
-        VisualElement content = FindContent(tab);
-        content.RemoveFromClassList(unselectedContentClassName);
-    }
-
-    /* Method for the unselected tab: 
-       -  Takes a tab as a parameter and removes the currentlySelectedTab class
-       -  Then finds the tab content and adds the unselectedContent class */
-    private void UnselectTab(Button tab)
-    {
-        tab.RemoveFromClassList(currentlySelectedTabClassName);
-        VisualElement content = FindContent(tab);
-        content.AddToClassList(unselectedContentClassName);
-    }
-
-    // Method to generate the associated tab content name by for the given tab name
-    private static string GenerateContentName(Button tab) =>
-        tab.name.Replace(tabNameSuffix, contentNameSuffix);
-
-    // Method that takes a tab as a parameter and returns the associated content element
-    private VisualElement FindContent(Button tab)
-    {
-        return root.Q(GenerateContentName(tab));
     }
 }

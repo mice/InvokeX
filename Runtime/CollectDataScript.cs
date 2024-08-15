@@ -10,12 +10,12 @@ public class CollectData
         return MethodParameters.ContainsKey(methodName);
     }
 
-    public void AddMethodAndParameters(string methodName,string typeName, string parameters,bool isIL) {
+    public void AddMethodAndParameters(string methodName,string typeName, string parameters,string methodTypeName) {
         if (!MethodParameters.ContainsKey(methodName))
-            MethodParameters.Add(methodName, new KVPair(typeName, parameters, isIL));
+            MethodParameters.Add(methodName, new KVPair(typeName, parameters, methodTypeName));
         else
         {
-            MethodParameters[methodName] = new KVPair(typeName, parameters, isIL);
+            MethodParameters[methodName] = new KVPair(typeName, parameters, methodTypeName);
         }
     }
 
@@ -50,15 +50,15 @@ public class KVPair
 {
     public string key;
     public string value;
-    public bool isil;
+    public string methodTypeName;
     public string Item1 => key;
     public string Item2 => value;
-    public bool Item3 => isil;
-    public KVPair(string key,string value, bool isil)
+    public bool IsIL() => methodTypeName == "MethodIL";
+    public KVPair(string key,string value, string methodTypeName)
     {
         this.key = key;
         this.value = value;
-        this.isil = isil;
+        this.methodTypeName = methodTypeName;
     }
 }
 

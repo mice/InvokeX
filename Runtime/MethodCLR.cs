@@ -1,26 +1,25 @@
-﻿using UnityEngine;
-using System;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Reflection;
+using UnityEngine;
 
-
-#if !DISABLE_ILRUNTIME
-public class MethodIL : IMethodInfoData
+public class MethodCLR : IMethodInfoData
 {
     public string Name => Data.Name;
-    public string TargetTypeName => Data.DeclearingType.Name;
-    public string TypeName => nameof(MethodIL);
+    public string TargetTypeName => Data.DeclaringType.Name;
+    public string TypeName => nameof(MethodCLR);
     public int ParamCount { get; private set; }
-    public ILRuntime.CLR.Method.IMethod Data;
+    public MethodBase Data;
 
-    public MethodIL(ILRuntime.CLR.Method.IMethod method)
+    public MethodCLR(MethodBase method)
     {
         this.Data = method;
-        this.ParamCount = method.ParameterCount;
+        this.ParamCount = method.GetParameters().Length;
     }
 
     public ParameterInfo[] GetParameters()
     {
-        return Array.Empty<ParameterInfo>();
+        return Data.GetParameters();
     }
 
     public string ToJson(object[] arr)
@@ -28,13 +27,13 @@ public class MethodIL : IMethodInfoData
         if (arr.Length > 0)
         {
             SerDict<string, string> data = new SerDict<string, string>();
-            var infos = Data.Parameters;
+            var infos = Data.GetParameters();
             for (int i = 0; i < arr.Length; i++)
             {
                 data[infos[i].Name] = arr[i].ToString();
             }
 
-            var content = JsonUtility.ToJson(data);
+            var content = JsonUtility.ToJson(data); ;
             return content;
         }
 
@@ -48,7 +47,7 @@ public class MethodIL : IMethodInfoData
         {
             SerDict<string, string> data = JsonUtility.FromJson<SerDict<string, string>>(stringObjs);
             objs = new object[data.Count];
-            var infos = Data.Parameters;
+            var infos = Data.GetParameters();
             for (int i = 0; i < data.Count; i++)
             {
                 objs[i] = data[infos[i].Name] as object;
@@ -58,4 +57,3 @@ public class MethodIL : IMethodInfoData
         return objs;
     }
 }
-#endif

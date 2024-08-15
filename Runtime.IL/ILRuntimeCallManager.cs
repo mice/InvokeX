@@ -128,7 +128,18 @@ public class ILRuntimeCallManager
         }
     }
 
-    public void GetCollectMethodDictionary(SerDict<string, KVPair> methodDict, Dictionary<string, IMethod> typeDict)
+    public void GetCollectMethodDictionary(SerDict<string, KVPair> methodDict, List<IMethodInfoData> list)
+    {
+        var ilMethodTable = new Dictionary<string, ILRuntime.CLR.Method.IMethod>();
+        _GetCollectMethodDictionary(methodDict, ilMethodTable);
+
+        foreach (var item in ilMethodTable.Values)
+        {
+            list.Add(new MethodIL(item));
+        }
+    }
+
+    private void _GetCollectMethodDictionary(SerDict<string, KVPair> methodDict, Dictionary<string, IMethod> typeDict)
     {
         var logMethName = string.Empty;
 
@@ -138,7 +149,7 @@ public class ILRuntimeCallManager
             if (string.Equals(typeName, "CPlayerMsgCallerProxy"))
                 typeName = "Protocal";
 
-            if (methodItem.Value.Item3 && targetCallDict.TryGetValue(typeName, out var _target) && typeMethodDict.TryGetValue(_target.Item1, out var methodTable))
+            if (methodItem.Value.IsIL()&& targetCallDict.TryGetValue(typeName, out var _target) && typeMethodDict.TryGetValue(_target.Item1, out var methodTable))
             {
                 var methodName = methodItem.Key;
                 var methodTableDict = methodTable.dict;

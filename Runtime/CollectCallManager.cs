@@ -54,19 +54,19 @@ public class CollectCallManager
         PlayerPrefs.SetString(MARK_KEY, content);
     }
 
-    public void CollectMethod(string methodName, string typeName, string parameters, bool isIL)
+    public void CollectMethod(string methodName, string typeName, string parameters, string methodTypeName)
     {
         marked.Remove(methodName);
         marked.Add(methodName);
         
-        methodParameters.AddMethodAndParameters(methodName, typeName, parameters, isIL);
+        methodParameters.AddMethodAndParameters(methodName, typeName, parameters, methodTypeName);
         SaveCollectData();
         DataUpdateAction?.Invoke();
     }
 
-    public void AddCollectMethod(string methodName, string typeName, string parameters, bool isIL) {
+    public void AddCollectMethod(string methodName, string typeName, string parameters, string methodTypeName) {
        
-        methodParameters.AddMethodAndParameters(methodName, typeName, parameters, isIL);
+        methodParameters.AddMethodAndParameters(methodName, typeName, parameters, methodTypeName);
         SaveCollectData();
         DataUpdateAction?.Invoke();
     }

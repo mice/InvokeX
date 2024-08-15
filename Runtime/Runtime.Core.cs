@@ -32,6 +32,8 @@ public interface IParamData
 public interface IMethodInfoData
 {
     String Name { get; }
+    String TypeName { get; }
+    string TargetTypeName { get; }
     int ParamCount { get; }
     ParameterInfo[] GetParameters();
 

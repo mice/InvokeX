@@ -91,7 +91,18 @@ public class RuntimeCallManager
         }
     }
 
-    public void GetCollectMethodDictionary(SerDict<string, KVPair> methodDict, Dictionary<string, MethodBase> typeDict)
+    public void GetCollectMethodDictionary(SerDict<string, KVPair> methodDict, List<IMethodInfoData> list)
+    {
+        var methodTable = new Dictionary<string, MethodBase>();
+        _GetCollectMethodDictionary(methodDict,methodTable);
+        foreach (var item in methodTable.Values)
+        {
+            list.Add(new MethodCLR(item));
+        }
+    }
+       
+
+    private void _GetCollectMethodDictionary(SerDict<string, KVPair> methodDict, Dictionary<string, MethodBase> typeDict)
     {
         var logMethName = string.Empty;
     
@@ -101,7 +112,7 @@ public class RuntimeCallManager
             if (string.Equals(typeName, "CPlayerMsgCallerProxy"))
                 typeName = "Protocal";
 
-            if (methodItem.Value.Item3 == false && targetCallDict.TryGetValue(typeName, out var _target) && typeMethodDict.TryGetValue(_target.Item1, out var methodTable))
+            if (!methodItem.Value.IsIL() && targetCallDict.TryGetValue(typeName, out var _target) && typeMethodDict.TryGetValue(_target.Item1, out var methodTable))
             {
                 var methodName = methodItem.Key;
                 var methodTableDict = methodTable.dict;
@@ -122,7 +133,6 @@ public class RuntimeCallManager
 
 
     }
-
 
     public void AddStatic(Type type)
     {
