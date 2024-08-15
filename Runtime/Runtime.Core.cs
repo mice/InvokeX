@@ -14,4 +14,7 @@ public interface IMethodInfoData
     String Name { get; }
     int ParamCount { get; }
     ParameterInfo[] GetParameters();
+
+    string ToJson(object[] objs);
+    object[] FromJson(string stringObjs);
 }

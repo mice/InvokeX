@@ -502,17 +502,6 @@ public class UIRuntimeCallV : EditorWindow
     }
 }
 
-public interface IMethodInfoData
-{
-    String Name { get; }
-
-    int ParamCount { get; }
-    ParameterInfo[] GetParameters();
-
-    string ToJson(object[] objs);
-    object[] FromJson(string stringObjs);
-}
-
 public class MethodCLR : IMethodInfoData
 {
     public string Name => Data.Name;
