@@ -5,6 +5,8 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
+
+
 public static partial class TypeElementRendererExt
 {
 
@@ -403,5 +405,5 @@ public static partial class TypeElementRendererExt
     
 
 
-    public static TypeElementRendererFactory factory;
+    public static ITypeElementRendererFactory factory;
 }

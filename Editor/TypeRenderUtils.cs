@@ -9,14 +9,12 @@ using UnityEngine.UIElements;
 public static partial class TypeRenderUtils
 {
     private static TypeElementRendererFactory factory = new TypeElementRendererFactory().Init();
-    static TypeRenderUtils(){
-        //TypeElementRenderer.factory = factory;
-    }
 
     public static void Init()
     {
-        factory = new TypeElementRendererFactory().Init();
-        TypeElementRendererExt.factory = factory;
+        factory = new TypeElementRendererFactory()
+            .Register(new NativeTypeElementRegister())
+            .Init();
     }
 
     public static void RenderParams(ScrollView selectItemViews, ParameterInfo[] parameterInfos,string methodName = "UnNamed")

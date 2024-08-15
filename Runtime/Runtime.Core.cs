@@ -9,6 +9,17 @@ public interface IElementRendererFactory
     TypeElementRenderer GetRender(Type type, string label);
 }
 
+
+public interface ITypeElementRegister
+{
+    void Register(ITypeElementRendererFactory factory, Action<Type, System.Func<System.Type, string, TypeElementRenderer>> register);
+}
+
+public interface ITypeElementRendererFactory
+{
+    TypeElementRenderer GetRender(Type type, string label);
+}
+
 public interface IMethodInfoData
 {
     String Name { get; }

@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
-public class TypeElementRendererFactory
+public class NativeTypeElementRegister : ITypeElementRegister
 {
-    private Dictionary<Type, System.Func<System.Type, string, TypeElementRenderer>> creatorDict = new Dictionary<Type, Func<System.Type, string, TypeElementRenderer>>();
-
-
-    public TypeElementRendererFactory Init()
+    public static NativeTypeElementRegister Instance { get; private set; } = new NativeTypeElementRegister(); 
+    public void Register(ITypeElementRendererFactory factory,Action<Type, System.Func<System.Type, string, TypeElementRenderer>> RegisterType)
     {
+        TypeElementRendererExt.factory = factory;
         RegisterType(typeof(sbyte), TypeElementRendererExt.ByteRenderer);
         RegisterType(typeof(byte), TypeElementRendererExt.UByteRenderer);
         RegisterType(typeof(short), TypeElementRendererExt.ShortRenderer);
@@ -34,6 +34,38 @@ public class TypeElementRendererFactory
         RegisterType(typeof(System.Collections.Generic.List<>), TypeElementRendererExt.ListRenderer);
         RegisterType(typeof(UnityEngine.Object), TypeElementRendererExt.UObjectRenderer);
         RegisterType(typeof(IParamData), TypeElementRendererExt.IParamDataRenderer);
+    }
+}
+
+
+public class TypeElementRendererFactory:ITypeElementRendererFactory
+{
+    private Dictionary<Type, System.Func<System.Type, string, TypeElementRenderer>> creatorDict = new Dictionary<Type, Func<System.Type, string, TypeElementRenderer>>();
+    private List<ITypeElementRegister> typeElementRegisters = new List<ITypeElementRegister>();
+    public TypeElementRendererFactory Register(ITypeElementRegister typeElementRegister)
+    {
+        if (!typeElementRegisters.Contains(typeElementRegister))
+        {
+            typeElementRegisters.Add(typeElementRegister);
+        }
+        else
+        {
+            UnityEngine.Debug.LogWarning("Dup Add!");
+        }
+        return this;
+    }
+
+    public TypeElementRendererFactory Init()
+    {
+        if (typeElementRegisters.Count == 0)
+        {
+            typeElementRegisters.Add(NativeTypeElementRegister.Instance);
+        }
+        foreach (var typeElementRegister in typeElementRegisters)
+        {
+            typeElementRegister.Register(this, RegisterType);
+        }
+
 #if !DISABLE_ILRUNTIME
         RegisterType(typeof(ILRuntime.Runtime.Intepreter.ILTypeInstance), TypeElementRendererExt.ILTypeRender);
 #endif
