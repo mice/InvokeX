@@ -6,11 +6,22 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public static partial class TypeRenderUtils
+public class ILMethodRender : MethodRenderBase, IMethodRender
 {
-    public static void RenderILParams(ScrollView selectItemViews, List<ILRuntime.CLR.TypeSystem.IType> parameterInfos)
+    public override void RenderMethodAndParams(ScrollView selectItemViews, IMethodInfoData method, object[] parameters)
+    {
+        RenderMethodAndParams(selectItemViews,method as MethodIL,parameters);
+    }
+
+    public override void RenderMethod(ScrollView selectItemViews, IMethodInfoData method)
+    {
+        RenderILMethod(selectItemViews, method as MethodIL);
+    }
+
+    public void RenderILMethod(ScrollView selectItemViews, MethodIL methodIL)
     {
         selectItemViews.Clear();
+        List<ILRuntime.CLR.TypeSystem.IType> parameterInfos = methodIL.Data.Parameters;
         var container = new ParamRendererContainer();
         for (int i = 0; i < parameterInfos.Count; i++)
         {
@@ -29,9 +40,10 @@ public static partial class TypeRenderUtils
         selectItemViews.userData = container;
     }
 
-    public static void RenderSetILParams(ScrollView selectItemViews, List<ILRuntime.CLR.TypeSystem.IType> parameterInfos,object[] Parameters)
+    private void _RenderSetILMethodAndParams(ScrollView selectItemViews, MethodIL ilMethod,object[] Parameters)
     {
         selectItemViews.Clear();
+        List<ILRuntime.CLR.TypeSystem.IType> parameterInfos = ilMethod.Data.Parameters;
         var container = new ParamRendererContainer();
         for (int i = 0; i < parameterInfos.Count; i++)
         {
@@ -63,7 +75,7 @@ public static partial class TypeRenderUtils
         selectItemViews.userData = container;
     }
 
-    private static TypeElementRenderer GetILTypeView(System.Type parameterType, string paramName)
+    private TypeElementRenderer GetILTypeView(System.Type parameterType, string paramName)
     {
         if (parameterType.UnderlyingSystemType == typeof(ILRuntime.Runtime.Intepreter.ILTypeInstance))
         {

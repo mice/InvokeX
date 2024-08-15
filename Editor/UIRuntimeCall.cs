@@ -12,6 +12,8 @@ public class UIRuntimeCallV : EditorWindow
     public static void ShowExample()
     {
         var wnd = EditorWindow.GetWindow<UIRuntimeCallV>(true, nameof(UIRuntimeCallV));
+        TypeRenderUtils.Register(NativeTypeElementRegister.Instance);
+        TypeRenderUtils.Init();
         wnd.minSize = new Vector2(1200, 300);
     }
 
@@ -407,21 +409,16 @@ public class UIRuntimeCallV : EditorWindow
                 if (scrollView.userData !=null && scrollView.userData is ParamRendererContainer renderContainer)
                      arr = MakeParams(target, renderContainer);
 
+                var collectCallManager = CollectCallManager.Instance;
+                var typeName = target.Name;
+                var parametersStr = target.ToJson(arr);
                 if (target is MethodCLR method)
                 {
-                    var collectCallManager= CollectCallManager.Instance;
-                    var typeName= method.Data.DeclaringType.Name;
-
-                    var parametersStr= method.ToJson(arr);
                     collectCallManager.CollectMethod(method.Name, typeName, parametersStr,false);
                 }
 #if !DISABLE_ILRUNTIME
                 else if (target is MethodIL methodYYY)
                 {
-                    var collectCallManager = CollectCallManager.Instance;
-                    var typeName = methodYYY.Data.DeclearingType.Name;
-
-                    var parametersStr = methodYYY.ToJson(arr);
                     collectCallManager.CollectMethod(methodYYY.Name, typeName, parametersStr,true);
                 }
 #endif

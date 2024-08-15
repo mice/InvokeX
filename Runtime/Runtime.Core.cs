@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using UnityEngine.UIElements;
 
 public interface IElementRendererFactory
 {
@@ -20,6 +21,14 @@ public interface ITypeElementRendererFactory
     TypeElementRenderer GetRender(Type type, string label);
 }
 
+/// <summary>
+/// 作为一个marker
+/// </summary>
+public interface IParamData
+{
+
+}
+
 public interface IMethodInfoData
 {
     String Name { get; }
@@ -28,4 +37,11 @@ public interface IMethodInfoData
 
     string ToJson(object[] objs);
     object[] FromJson(string stringObjs);
+}
+
+
+public interface IMethodRender
+{
+    void RenderMethod(ScrollView selectItemViews, IMethodInfoData method);
+    void RenderMethodAndParams(ScrollView selectItemViews, IMethodInfoData method,object[] parameters);
 }

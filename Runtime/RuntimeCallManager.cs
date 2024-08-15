@@ -3,13 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 
 
-/// <summary>
-/// 作为一个marker
-/// </summary>
-public interface IParamData
-{
 
-}
 
 /// <summary>
 /// 需要处理Interface的插入.

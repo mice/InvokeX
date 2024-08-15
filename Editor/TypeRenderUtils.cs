@@ -1,21 +1,28 @@
-﻿using System.Collections.Generic;
+﻿using ILRuntime.CLR.Method;
+using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
-using static UnityEngine.GraphicsBuffer;
 
 
 public static partial class TypeRenderUtils
 {
     private static List<ITypeElementRegister> typeElementRegisters = new List<ITypeElementRegister>();
-    private static TypeElementRendererFactory factory = new TypeElementRendererFactory().Init(typeElementRegisters);
+    public static TypeElementRendererFactory factory = new TypeElementRendererFactory().Init(typeElementRegisters);
+    private static Dictionary<System.Type, IMethodRender> methodRenderDict = new Dictionary<System.Type, IMethodRender>();
     public static void Init()
     {
         factory = new TypeElementRendererFactory()
             .Init(typeElementRegisters);
+
+        var clrMethodRender = new CLRMethodRender();
+        clrMethodRender.factory = factory;
+
+        methodRenderDict[typeof(MethodCLR)] = clrMethodRender;
     }
 
-    
+
     public static void Register(ITypeElementRegister typeElementRegister)
     {
         if (!typeElementRegisters.Contains(typeElementRegister))
@@ -54,78 +61,20 @@ public static partial class TypeRenderUtils
 
     }
 
-    /// <summary>
-    /// TODO---------fix
-    /// 先苟且一下.
-    /// 难用当前type确定.最好是在ParamRendererContainer里面提供信息.
-    /// </summary>
-    /// <param name="selectItemViews"></param>
-    /// <param name="parameterInfos"></param>
-    /// <param name="Params"></param>
-    public static void RenderLogParams(ScrollView selectItemViews, ParameterInfo[] parameterInfos, object[] Params) {
-        var children= selectItemViews.Children();
-        int i = 0;
-        var dd = selectItemViews.userData as ParamRendererContainer;
-
-        var tmpTextBaseType = typeof(TextValueField<>);
-        foreach (var child in children)
-        {
-            var strParams = Params[i].ToString();
-            var tmpType = parameterInfos[i].GetType();
-            var viewType = child.GetType();
-            var ddsub = dd.list[i];
-               
-            if(child is UnityEngine.UIElements.TextField textField)
-            {
-                textField.value = strParams;
-            }else if (child is UnityEditor.UIElements.IntegerField intField)
-            {
-                int.TryParse(strParams, out var num);
-                intField.value = num;
-            }
-            i += 1;
-        }
-    }
-
-    private static void RenderCLRMethod(ScrollView selectItemViews, MethodCLR method)
-    {
-        ParameterInfo[] parameterInfos = method.GetParameters();
-        RenderParams(selectItemViews, parameterInfos);
-    }
-
-    private static void RenderClrMethodAndParams(ScrollView selectItemViews, MethodCLR method,object[] Parameters)
-    {
-        ParameterInfo[] parameterInfos = method.GetParameters();
-        RenderParams(selectItemViews, parameterInfos);
-        RenderLogParams(selectItemViews,parameterInfos, Parameters);
-    }
 
     public static void RenderMethod(ScrollView selectItemViews, IMethodInfoData method)
     {
-        if (method is MethodCLR methodCLR)
+        if(methodRenderDict.TryGetValue(method.GetType(),out var render))
         {
-            TypeRenderUtils.RenderCLRMethod(selectItemViews, methodCLR);
+            render.RenderMethod(selectItemViews, method);
         }
-#if !DISABLE_ILRUNTIME
-        else if (method is MethodIL methodIL)
-        {
-
-            TypeRenderUtils.RenderILParams(selectItemViews, methodIL.Data.Parameters);
-        }
-#endif
     }
 
-    public static void RenderMethodAndParams(ScrollView selectItemViews, IMethodInfoData method, object[] Parameters)
+    public static void RenderMethodAndParams(ScrollView selectItemViews, IMethodInfoData method, object[] parameters)
     {
-        if (method is MethodCLR methodCLR)
+        if (methodRenderDict.TryGetValue(method.GetType(), out var render))
         {
-            TypeRenderUtils.RenderClrMethodAndParams(selectItemViews, methodCLR, Parameters);
+            render.RenderMethodAndParams(selectItemViews, method, parameters);
         }
-#if !DISABLE_ILRUNTIME
-        else if (method is MethodIL methodIL)
-        {
-            TypeRenderUtils.RenderSetILParams(selectItemViews, methodIL.Data.Parameters, Parameters);
-        }
-#endif
     }
 }
