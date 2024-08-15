@@ -16,14 +16,17 @@ public static partial class TypeRenderUtils
         factory = new TypeElementRendererFactory()
             .Init(typeElementRegisters);
 
-        var clrMethodRender = new CLRMethodRender();
-        clrMethodRender.factory = factory;
+        var clrMethodRender = new CLRMethodRender(factory);
 
         methodRenderDict[typeof(MethodCLR)] = clrMethodRender;
+        foreach(var item in methodRenderDict.Values)
+        {
+            item.Factory = factory;
+        }
     }
 
 
-    public static void Register(ITypeElementRegister typeElementRegister)
+    public static void Register<T>(ITypeElementRegister typeElementRegister, IMethodRender methodRender) where T:IMethodInfoData
     {
         if (!typeElementRegisters.Contains(typeElementRegister))
         {
@@ -33,6 +36,8 @@ public static partial class TypeRenderUtils
         {
             UnityEngine.Debug.LogWarning("Dup Add!");
         }
+
+        methodRenderDict[typeof(MethodCLR)] = methodRender;
     }
 
     public static void RenderParams(ScrollView selectItemViews, ParameterInfo[] parameterInfos,string methodName = "UnNamed")
@@ -57,8 +62,6 @@ public static partial class TypeRenderUtils
         }
 
         selectItemViews.userData = container;
-
-
     }
 
 

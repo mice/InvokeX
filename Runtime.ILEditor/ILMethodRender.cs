@@ -6,14 +6,21 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class ILMethodRender : MethodRenderBase, IMethodRender
+public class ILMethodRender :  IMethodRender
 {
-    public override void RenderMethodAndParams(ScrollView selectItemViews, IMethodInfoData method, object[] parameters)
+    public ITypeElementRendererFactory Factory { get; set; }
+
+    public ILMethodRender(ITypeElementRendererFactory factory)
+    {
+        this.Factory = factory;
+    }
+
+    public void RenderMethodAndParams(ScrollView selectItemViews, IMethodInfoData method, object[] parameters)
     {
         RenderMethodAndParams(selectItemViews,method as MethodIL,parameters);
     }
 
-    public override void RenderMethod(ScrollView selectItemViews, IMethodInfoData method)
+    public void RenderMethod(ScrollView selectItemViews, IMethodInfoData method)
     {
         RenderILMethod(selectItemViews, method as MethodIL);
     }
@@ -77,6 +84,7 @@ public class ILMethodRender : MethodRenderBase, IMethodRender
 
     private TypeElementRenderer GetILTypeView(System.Type parameterType, string paramName)
     {
+        var factory = Factory;
         if (parameterType.UnderlyingSystemType == typeof(ILRuntime.Runtime.Intepreter.ILTypeInstance))
         {
             var renderer = factory.GetRender(parameterType, paramName);

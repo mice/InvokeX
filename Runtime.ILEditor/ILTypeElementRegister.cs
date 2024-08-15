@@ -10,6 +10,8 @@ using UnityEngine.UIElements;
 
 public partial class ILTypeElementRegister:ITypeElementRegister
 {
+    public static ILTypeElementRegister Instance { get; private set; } = new ILTypeElementRegister();
+
     public static ITypeElementRendererFactory factory;
     public void Register(ITypeElementRendererFactory factory, Action<Type, Func<Type, string, TypeElementRenderer>> register)
     {

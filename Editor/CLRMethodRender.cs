@@ -3,15 +3,21 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class CLRMethodRender : MethodRenderBase, IMethodRender
+public class CLRMethodRender : IMethodRender
 {
-    public override void RenderMethod(ScrollView selectItemViews, IMethodInfoData method)
+    public ITypeElementRendererFactory Factory { get; set; }
+    private ITypeElementRendererFactory factory => Factory;
+    public CLRMethodRender(ITypeElementRendererFactory factory)
+    {
+        this.Factory = factory;
+    }
+    public void RenderMethod(ScrollView selectItemViews, IMethodInfoData method)
     {
         ParameterInfo[] parameterInfos = method.GetParameters();
         TypeRenderUtils.RenderParams(selectItemViews, parameterInfos);
     }
 
-    public override void RenderMethodAndParams(ScrollView selectItemViews, IMethodInfoData method, object[] parameters)
+    public void RenderMethodAndParams(ScrollView selectItemViews, IMethodInfoData method, object[] parameters)
     {
         ParameterInfo[] parameterInfos = method.GetParameters();
         TypeRenderUtils.RenderParams(selectItemViews, parameterInfos);

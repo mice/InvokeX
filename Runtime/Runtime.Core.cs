@@ -42,6 +42,7 @@ public interface IMethodInfoData
 
 public interface IMethodRender
 {
+    ITypeElementRendererFactory Factory { get; set; }
     void RenderMethod(ScrollView selectItemViews, IMethodInfoData method);
     void RenderMethodAndParams(ScrollView selectItemViews, IMethodInfoData method,object[] parameters);
 }

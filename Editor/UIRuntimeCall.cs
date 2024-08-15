@@ -12,7 +12,8 @@ public class UIRuntimeCallV : EditorWindow
     public static void ShowExample()
     {
         var wnd = EditorWindow.GetWindow<UIRuntimeCallV>(true, nameof(UIRuntimeCallV));
-        TypeRenderUtils.Register(NativeTypeElementRegister.Instance);
+        TypeRenderUtils.Register<MethodCLR>(NativeTypeElementRegister.Instance , new CLRMethodRender(null));
+        TypeRenderUtils.Register<MethodIL>(ILTypeElementRegister.Instance, new ILMethodRender(null));
         TypeRenderUtils.Init();
         wnd.minSize = new Vector2(1200, 300);
     }
