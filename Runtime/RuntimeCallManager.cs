@@ -2,13 +2,10 @@
 using System.Collections.Generic;
 using System.Reflection;
 
-
-
-
 /// <summary>
 /// 需要处理Interface的插入.
 /// </summary>
-public class RuntimeCallManager
+public class RuntimeCallManager:IMethodInvoker, IMethodRepository
 {
     internal class RuntimeMethodTable
     {
@@ -195,6 +192,16 @@ public class RuntimeCallManager
         {
             methodTable.Invoke(_target.Item2, v2, param);
         }
+    }
+
+    public void Invoke(IMethodInfoData method)
+    {
+        Invoke(method.TargetTypeName, method.Name, Array.Empty<object>());
+    }
+
+    public void Invoke(IMethodInfoData method, object[] param)
+    {
+        Invoke(method.TargetTypeName, method.Name, param);
     }
 
     public MethodBase GetMethodData(string v1, string v2)

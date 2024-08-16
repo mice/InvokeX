@@ -7,6 +7,9 @@ public interface ICallDataBuilder
     void Build(Dictionary<string, Type> typeDict, Dictionary<string, System.Action> actionList);
 }
 
+/// <summary>
+/// 这个抽象层级有问题.
+/// </summary>
 public class CallDataProvider
 {
     public Dictionary<string, Type> typeDict = new Dictionary<string, Type>();
@@ -17,49 +20,13 @@ public class CallDataProvider
         UnityEngine.Debug.LogError("Test");
     }
 
-    //public void ShowTextLevelUp()
-    //{
-    //    if (!Application.isPlaying)
-    //        return;
-        
-    //    QKILRuntimeEngine.Instance.ILInvoke("ViewUtils", "ShowLvUp");
-    //}
-
-    //public void ShowFunctionOpen()
-    //{
-    //    if (!Application.isPlaying)
-    //        return;
-
-    //    QKILRuntimeEngine.Instance.ILInvoke("ViewUtils", "ShowFunctionOpen");
-    //}
-
-    //public void ShowCelebrateOpenLog()
-    //{
-    //    if (!Application.isPlaying)
-    //        return;
-
-    //    var appdomain = QKILRuntimeEngine.Instance.Appdomain;
-    //    QKILRuntimeEngine.Instance.ILInvoke("ViewUtils", "DumpCelebrate");
-    //}
-
     public void InitData()
     {
         if (Builder != null)
         {
             Builder.Build(typeDict, actionList);
         }
-        //InitBtns();
-        //InitTypes();
-        //InitILCall();
     }
-
-    //private void InitBtns()
-    //{
-    //    actionList.Clear();
-    //    actionList.Add("升级", ShowTextLevelUp);
-    //    actionList.Add("功能开放", ShowFunctionOpen);
-    //    actionList.Add("活动时间", ShowCelebrateOpenLog);
-    //}
 
     public void CreateTabs(List<string> tabs, List<bool> tabTypes)
     {
@@ -88,12 +55,4 @@ public class CallDataProvider
         tabs.Add(tab);
         tabTypes.Add(false);
     }
-
-    //private void InitTypes()
-    //{
-    //    var targetMgr = RuntimeCallManager.Instance;
-    //    targetMgr.AddInstance(nameof(GMScripts), new GMScripts());
-    //    targetMgr.GetTypeDictionary(typeDict);
-    //}
-
 }

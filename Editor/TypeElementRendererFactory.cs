@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-
-
 
 public class TypeElementRendererFactory:ITypeElementRendererFactory
 {
@@ -33,7 +30,6 @@ public class TypeElementRendererFactory:ITypeElementRendererFactory
             return creator.Invoke(type, label);
         }
 
-        //---
         if (type.IsArray)
         {
             var subType = type.GetElementType();

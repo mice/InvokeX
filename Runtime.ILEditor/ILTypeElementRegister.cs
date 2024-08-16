@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
-
 public partial class ILTypeElementRegister:ITypeElementRegister
 {
     public static ILTypeElementRegister Instance { get; private set; } = new ILTypeElementRegister();
@@ -15,7 +14,6 @@ public partial class ILTypeElementRegister:ITypeElementRegister
     {
         ILTypeElementRegister.factory = factory;
         register(typeof(ILRuntime.Runtime.Intepreter.ILTypeInstance), ILTypeElementRegister.ILTypeRender);
-
     }
 
     public static TypeElementRenderer ILTypeRender(System.Type parameterType, string paramName)
@@ -251,7 +249,5 @@ public partial class ILTypeElementRegister:ITypeElementRegister
         };
         return renderer;
     }
-
-   
 }
 #endif

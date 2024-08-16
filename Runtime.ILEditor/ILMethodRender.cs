@@ -101,7 +101,6 @@ public class ILMethodRender :  IMethodRender
             var renderer = factory.GetRender(parameterType, paramName);
             return renderer;
         }
-        //UnityEngine.Debug.LogError($"No Render Found ILType:{parameterType}:name:{paramName}");
     }
 }
 #endif

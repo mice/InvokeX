@@ -6,7 +6,7 @@ using ILRuntime.Runtime.Enviorment;
 using ILRuntime.Runtime.Intepreter;
 using UnityEngine;
 
-public class ILRuntimeCallManager
+public class ILRuntimeCallManager:IMethodInvoker, IMethodRepository
 {
     internal class RuntimeMethodTable
     {
@@ -182,6 +182,23 @@ public class ILRuntimeCallManager
         {
             methodTable.Invoke(appDomain, _target.Item2, methodName, paramArr);
         }
+    }
+
+    public void Invoke(IMethodInfoData method)
+    {
+        var typeName = method.TargetTypeName;
+        if (string.Equals(typeName, "CPlayerMsgCallerProxy"))
+            typeName = "Protocal";
+
+        Invoke(typeName, method.Name);
+    }
+
+    public void Invoke(IMethodInfoData method,object[] param)
+    {
+        var typeName = method.TargetTypeName;
+        if (string.Equals(typeName, "CPlayerMsgCallerProxy"))
+            typeName = "Protocal";
+        Invoke(typeName, method.Name, param);
     }
 }
 #endif

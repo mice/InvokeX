@@ -48,3 +48,18 @@ public interface IMethodRender
     void RenderMethod(ScrollView selectItemViews, IMethodInfoData method);
     void RenderMethodAndParams(ScrollView selectItemViews, IMethodInfoData method,object[] parameters);
 }
+
+public interface IMethodInvoker
+{
+    void Invoke(IMethodInfoData method);
+
+    void Invoke(IMethodInfoData method, object[] param);
+}
+
+
+public interface IMethodRepository:IMethodInvoker
+{
+    void GetCollectMethodDictionary(SerDict<string, KVPair> methodDict, List<IMethodInfoData> list);
+
+}
+

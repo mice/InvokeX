@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -40,14 +41,22 @@ public class NativeTypeElementRegister : ITypeElementRegister
         RegisterType(typeof(IParamData), IParamDataRenderer);
     }
 
+    private static Regex intDigit = new Regex("^[0-9]+$",RegexOptions.Singleline);
     public static TypeElementRenderer ByteRenderer(System.Type targetType, string paramName)
     {
         var renderer = new TypeElementRenderer();
         renderer.type = typeof(sbyte);
-        renderer.element = new IntegerField(paramName);
+        var tField = new IntegerField(paramName);
+        renderer.element = tField;
+
         renderer.ToValueFunc = (r) =>
         {
-            return (sbyte)((IntegerField)renderer.element).value;
+            return System.Convert.ToSByte(tField.value);
+        };
+
+        renderer.SetValueAction = (obj) =>
+        {
+            tField.value = System.Convert.ToInt32(obj);
         };
 
         return renderer;
@@ -62,6 +71,10 @@ public class NativeTypeElementRegister : ITypeElementRegister
         {
             return (byte)((IntegerField)renderer.element).value;
         };
+        renderer.SetValueAction = (obj) =>
+        {
+            ((IntegerField)renderer.element).value = System.Convert.ToInt32(obj);
+        };
         return renderer;
     }
 
@@ -73,6 +86,10 @@ public class NativeTypeElementRegister : ITypeElementRegister
         renderer.ToValueFunc = (r) =>
         {
             return (short)((IntegerField)renderer.element).value;
+        };
+        renderer.SetValueAction = (obj) =>
+        {
+            ((IntegerField)renderer.element).value = System.Convert.ToInt32(obj);
         };
         return renderer;
     }
@@ -86,6 +103,10 @@ public class NativeTypeElementRegister : ITypeElementRegister
         {
             return (ushort)((IntegerField)renderer.element).value;
         };
+        renderer.SetValueAction = (obj) =>
+        {
+            ((IntegerField)renderer.element).value = System.Convert.ToInt32(obj);
+        };
         return renderer;
     }
 
@@ -97,6 +118,10 @@ public class NativeTypeElementRegister : ITypeElementRegister
         renderer.ToValueFunc = (r) =>
         {
             return ((IntegerField)renderer.element).value;
+        };
+        renderer.SetValueAction = (obj) =>
+        {
+            ((IntegerField)renderer.element).value = System.Convert.ToInt32(obj);
         };
         return renderer;
     }
@@ -110,6 +135,10 @@ public class NativeTypeElementRegister : ITypeElementRegister
         {
             return (uint)((IntegerField)renderer.element).value;
         };
+        renderer.SetValueAction = (obj) =>
+        {
+            ((IntegerField)renderer.element).value = System.Convert.ToInt32(obj);
+        };
         return renderer;
     }
 
@@ -121,6 +150,10 @@ public class NativeTypeElementRegister : ITypeElementRegister
         renderer.ToValueFunc = (r) =>
         {
             return ((LongField)renderer.element).value;
+        };
+        renderer.SetValueAction = (obj) =>
+        {
+            ((LongField)renderer.element).value = System.Convert.ToInt64(obj);
         };
         return renderer;
     }
@@ -134,6 +167,11 @@ public class NativeTypeElementRegister : ITypeElementRegister
         {
             return (ulong)((LongField)renderer.element).value;
         };
+
+        renderer.SetValueAction = (obj) =>
+        {
+            ((LongField)renderer.element).value = System.Convert.ToInt64(obj);
+        };
         return renderer;
     }
 
@@ -144,7 +182,11 @@ public class NativeTypeElementRegister : ITypeElementRegister
         renderer.element = new FloatField(paramName);
         renderer.ToValueFunc = (r) =>
         {
-            return (float)((LongField)renderer.element).value;
+            return (float)((FloatField)renderer.element).value;
+        };
+        renderer.SetValueAction = (obj) =>
+        {
+            ((FloatField)renderer.element).value = System.Convert.ToSingle(obj);
         };
         return renderer;
     }
@@ -156,7 +198,11 @@ public class NativeTypeElementRegister : ITypeElementRegister
         renderer.element = new DoubleField(paramName);
         renderer.ToValueFunc = (r) =>
         {
-            return (Double)((DoubleField)renderer.element).value;
+            return ((DoubleField)renderer.element).value;
+        };
+        renderer.SetValueAction = (obj) =>
+        {
+            ((DoubleField)renderer.element).value = System.Convert.ToDouble(obj);
         };
         return renderer;
     }
@@ -169,6 +215,10 @@ public class NativeTypeElementRegister : ITypeElementRegister
         renderer.ToValueFunc = (r) =>
         {
             return (bool)((Toggle)renderer.element).value;
+        };
+        renderer.SetValueAction = (obj) =>
+        {
+            ((Toggle)renderer.element).value = System.Convert.ToBoolean(obj);
         };
         return renderer;
     }
@@ -183,6 +233,11 @@ public class NativeTypeElementRegister : ITypeElementRegister
         {
             return ((TextField)renderer.element).text;
         };
+
+        renderer.SetValueAction = (obj) =>
+        {
+            ((TextField)renderer.element).value = System.Convert.ToString(obj);
+        };
         return renderer;
     }
 
@@ -194,6 +249,10 @@ public class NativeTypeElementRegister : ITypeElementRegister
         renderer.ToValueFunc = (r) =>
         {
             return ((ColorField)renderer.element).value;
+        };
+        renderer.SetValueAction = (obj) =>
+        {
+            ((ColorField)renderer.element).value = (Color)obj;
         };
         return renderer;
     }
@@ -207,6 +266,11 @@ public class NativeTypeElementRegister : ITypeElementRegister
         {
             return ((Vector2Field)renderer.element).value;
         };
+
+        renderer.SetValueAction = (obj) =>
+        {
+            ((Vector2Field)renderer.element).value = (Vector2)obj;
+        };
         return renderer;
     }
 
@@ -218,6 +282,11 @@ public class NativeTypeElementRegister : ITypeElementRegister
         renderer.ToValueFunc = (r) =>
         {
             return ((Vector3Field)renderer.element).value;
+        };
+
+        renderer.SetValueAction = (obj) =>
+        {
+            ((Vector3Field)renderer.element).value = (Vector3)obj;
         };
         return renderer;
     }
@@ -231,6 +300,11 @@ public class NativeTypeElementRegister : ITypeElementRegister
         {
             return ((Vector4Field)renderer.element).value;
         };
+
+        renderer.SetValueAction = (obj) =>
+        {
+            ((Vector4Field)renderer.element).value = (Vector4)obj;
+        };
         return renderer;
     }
 
@@ -243,6 +317,12 @@ public class NativeTypeElementRegister : ITypeElementRegister
         {
             return ((Vector2IntField)renderer.element).value;
         };
+
+        renderer.SetValueAction = (obj) =>
+        {
+            ((Vector2IntField)renderer.element).value = (Vector2Int)obj;
+        };
+
         return renderer;
     }
 
@@ -254,6 +334,11 @@ public class NativeTypeElementRegister : ITypeElementRegister
         renderer.ToValueFunc = (r) =>
         {
             return ((Vector3IntField)renderer.element).value;
+        };
+
+        renderer.SetValueAction = (obj) =>
+        {
+            ((Vector3IntField)renderer.element).value = (Vector3Int)obj;
         };
         return renderer;
     }
@@ -268,6 +353,11 @@ public class NativeTypeElementRegister : ITypeElementRegister
         {
             return ((RectField)renderer.element).value;
         };
+
+        renderer.SetValueAction = (obj) =>
+        {
+            ((RectField)renderer.element).value = (Rect)obj;
+        };
         return renderer;
     }
 
@@ -280,6 +370,11 @@ public class NativeTypeElementRegister : ITypeElementRegister
         renderer.ToValueFunc = (r) =>
         {
             return ((RectIntField)renderer.element).value;
+        };
+
+        renderer.SetValueAction = (obj) =>
+        {
+            ((RectIntField)renderer.element).value = (RectInt)obj;
         };
         return renderer;
     }
@@ -330,6 +425,12 @@ public class NativeTypeElementRegister : ITypeElementRegister
             }
             return obj;
         };
+
+        renderer.SetValueAction = (obj) =>
+        {
+            throw new NotImplementedException();
+        };
+
         return renderer;
     }
 
@@ -379,6 +480,13 @@ public class NativeTypeElementRegister : ITypeElementRegister
             }
             return obj;
         };
+
+
+        renderer.SetValueAction = (obj) =>
+        {
+            throw new NotImplementedException();
+        };
+
         return renderer;
     }
 
@@ -393,6 +501,10 @@ public class NativeTypeElementRegister : ITypeElementRegister
             return ((ObjectField)renderer.element).value;
         };
 
+        renderer.SetValueAction = (obj) =>
+        {
+            ((ObjectField)renderer.element).value = obj as UnityEngine.Object;
+        };
         return renderer;
     }
 
@@ -429,6 +541,12 @@ public class NativeTypeElementRegister : ITypeElementRegister
             }
             return obj;
         };
+
+        renderer.SetValueAction = (obj) =>
+        {
+            throw new NotImplementedException();
+        };
+
         return renderer;
     }
 

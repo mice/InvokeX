@@ -3,8 +3,6 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
-
 
 public class UIRuntimeCallV : EditorWindow
 {
@@ -51,7 +49,6 @@ public class UIRuntimeCallV : EditorWindow
 
         for (int i = 0; i < tabType.Count; i++)
         {
-
             if (i != 0 && tabType[i])
             {
                 new ContainerData<MethodCLR>(styleSheet, OnSelectItem).InitContainer(root, tabs[i], GetCLR);
@@ -67,6 +64,11 @@ public class UIRuntimeCallV : EditorWindow
 #endif
             }
         }
+    }
+
+    private void XXContainerData<T>()where T: IMethodInfoData
+    {
+
     }
 
     private void _CreateUI(VisualElement root)
@@ -157,13 +159,9 @@ public class UIRuntimeCallV : EditorWindow
 
     private void GetCollectMethod(string typeName,List<IMethodInfoData> list)
     {
+        var instance = RuntimeContext.Instance;
         var collectMgr = CollectCallManager.Instance;
-
-        RuntimeCallManager.Instance.GetCollectMethodDictionary(collectMgr.CollectData.MethodParameters, list);
-    
-#if !DISABLE_ILRUNTIME
-        ILRuntimeCallManager.Instance.GetCollectMethodDictionary(collectMgr.CollectData.MethodParameters, list);
-#endif
+        instance.GetCollectMethodDictionary(collectMgr.CollectData.MethodParameters, list);
     }
 
 #if !DISABLE_ILRUNTIME
@@ -203,6 +201,7 @@ public class UIRuntimeCallV : EditorWindow
 #endif
             if(target is IMethodInfoData methodInfo)
             {
+                scrollView.Clear();
                 if (methodInfo.ParamCount > 0)
                 {
                     TypeRenderUtils.RenderMethod(scrollView, methodInfo);
@@ -281,7 +280,6 @@ public class UIRuntimeCallV : EditorWindow
         try
         {
             var scrollView = rootVisualElement.Q<ScrollView>("typeContainer");
-            //&& scrollView.userData is ParamRendererContainer renderContainer
             if (scrollView != null )
             {
                 object[] arr = Array.Empty<object>();
@@ -289,20 +287,9 @@ public class UIRuntimeCallV : EditorWindow
                     arr = MakeParams(target, renderContainer);
 
                 var typeName = target.TargetTypeName;
+                var methodInfo = target;
 
-                //var arr = MakeParams(target, renderContainer);
-                if (target is MethodCLR method)
-                {
-                    RuntimeCallManager.Instance.Invoke(typeName, method.Name, arr);
-
-                }
-#if !DISABLE_ILRUNTIME
-                else if (target is MethodIL methodYYY)
-                {
-                    ILRuntimeCallManager.Instance.Invoke(sub, methodYYY.Name, arr);
-                }
-#endif
-
+                RuntimeContext.Instance.Invoke(methodInfo, arr);
                 var parametersStr = target.ToJson(arr);
                 var collectCallManager = CollectCallManager.Instance;
                 collectCallManager.AddCollectMethod(target.Name, typeName, parametersStr, target.TypeName);
@@ -332,19 +319,8 @@ public class UIRuntimeCallV : EditorWindow
                 var parametersStr = target.ToJson(arr);
                 collectCallManager.AddCollectMethod(methodName, typeName, parametersStr, target.TypeName);
 
-                if (target is MethodCLR method)
-                {
-                    RuntimeCallManager.Instance.Invoke(typeName, methodName, arr);
-                }
-#if !DISABLE_ILRUNTIME
-                else if (target is MethodIL methodYYY)
-                {
-                    if (string.Equals(typeName, "CPlayerMsgCallerProxy"))
-                        typeName = "Protocal";
-
-                    ILRuntimeCallManager.Instance.Invoke(typeName, methodYYY.Name, arr);
-                }
-#endif
+                var methodInfo = target;
+                RuntimeContext.Instance.Invoke(methodInfo, arr);
             }
         }
         catch (Exception exce)
@@ -627,22 +603,8 @@ public class ContainerData<T>
             var collectCallManager = CollectCallManager.Instance;
             collectCallManager.AddCollectMethod(methodInfo.Name, methodInfo.TargetTypeName, string.Empty, typeName);
 
-            if (string.Equals(typeName, "CPlayerMsgCallerProxy"))
-                typeName = "Protocal";
 
-            if (list[index] is MethodCLR methodCLR)
-            {
-                var targetMgr = RuntimeCallManager.Instance;
-                targetMgr.Invoke(typeName, methodCLR.Name, Array.Empty<object>());
-
-            }
-#if !DISABLE_ILRUNTIME
-            else if(list[index] is MethodIL methodIL)
-            {
-                var mgr = ILRuntimeCallManager.Instance;
-                mgr.Invoke(typeName, methodIL.Name);
-            }
-#endif
+            RuntimeContext.Instance.Invoke(methodInfo);
         }
     }
 
