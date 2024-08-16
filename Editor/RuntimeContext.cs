@@ -26,7 +26,7 @@ public class RuntimeContext
         IMethodRepository invoker
         ) where T : IMethodInfoData
     {
-        TypeRenderUtils.Register<T>(NativeTypeElementRegister.Instance, new CLRMethodRender(null));
+        TypeRenderUtils.Register<T>(NativeTypeElementRegister.Instance, methodRender);
         var tmpType = typeof(T).Name;
         if (!DelegationDict.ContainsKey(tmpType))
         {

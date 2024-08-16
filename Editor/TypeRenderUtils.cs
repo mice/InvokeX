@@ -30,7 +30,7 @@ public static partial class TypeRenderUtils
             typeElementRegisters.Add(typeElementRegister);
         }
 
-        methodRenderDict[typeof(MethodCLR)] = methodRender;
+        methodRenderDict[typeof(T)] = methodRender;
     }
 
     public static void RenderParams(ScrollView selectItemViews, ParameterInfo[] parameterInfos,string methodName = "UnNamed")
