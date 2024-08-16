@@ -46,7 +46,7 @@ public class NativeTypeElementRegister : ITypeElementRegister
     {
         var renderer = new TypeElementRenderer();
         renderer.type = typeof(sbyte);
-        var tField = new IntegerField(paramName);
+        var tField = new IntXField(paramName);
         renderer.element = tField;
 
         renderer.ToValueFunc = (r) =>
@@ -56,7 +56,7 @@ public class NativeTypeElementRegister : ITypeElementRegister
 
         renderer.SetValueAction = (obj) =>
         {
-            tField.value = System.Convert.ToInt32(obj);
+            tField.value = System.Convert.ToInt32(obj).ToString();
         };
 
         return renderer;
@@ -114,14 +114,17 @@ public class NativeTypeElementRegister : ITypeElementRegister
     {
         var renderer = new TypeElementRenderer();
         renderer.type = typeof(int);
-        renderer.element = new IntegerField(paramName);
+        var fieldView = new IntXField(paramName);
+        renderer.element = fieldView;
         renderer.ToValueFunc = (r) =>
         {
-            return ((IntegerField)renderer.element).value;
+            int.TryParse(fieldView.value, out var intValue);
+            return intValue;
         };
+
         renderer.SetValueAction = (obj) =>
         {
-            ((IntegerField)renderer.element).value = System.Convert.ToInt32(obj);
+            fieldView.value = System.Convert.ToInt32(obj).ToString();
         };
         return renderer;
     }
@@ -389,9 +392,14 @@ public class NativeTypeElementRegister : ITypeElementRegister
         var list = new List<TypeElementRenderer>();
 
         var sizeElement = factory.GetRender(typeof(int), "Size");
-        var sizeElementView = (IntegerField)sizeElement.element;
+        var sizeElementView = (IntXField)sizeElement.element;
+        //同样的pattern
         sizeElementView.RegisterValueChangedCallback(t => {
-            var newCount = t.newValue + 1;
+            if (int.TryParse(t.newValue, out var newValue))
+            {
+
+            }
+            var newCount = newValue + 1;
             var oldCount = foldout.childCount;
             if (newCount > oldCount)
             {
@@ -418,7 +426,8 @@ public class NativeTypeElementRegister : ITypeElementRegister
         renderer.element = foldout;
         renderer.ToValueFunc = (r) =>
         {
-            var obj = Array.CreateInstance(subType, sizeElementView.value);
+            var newSize = int.Parse(sizeElementView.value);
+            var obj = Array.CreateInstance(subType, newSize);
             for (int i = 0; i < list.Count; i++)
             {
                 obj.SetValue(list[i].ToValueFunc(list[i]), i);
@@ -444,9 +453,13 @@ public class NativeTypeElementRegister : ITypeElementRegister
         var list = new List<TypeElementRenderer>();
 
         var sizeElement = factory.GetRender(typeof(int), "Size");
-        var sizeElementView = (IntegerField)sizeElement.element;
+        var sizeElementView = (IntXField)sizeElement.element;
         sizeElementView.RegisterValueChangedCallback(t => {
-            var newCount = t.newValue + 1;
+            if (int.TryParse(t.newValue, out var newValue))
+            {
+
+            }
+            var newCount = newValue + 1;
             var oldCount = foldout.childCount;
             if (newCount > oldCount)
             {

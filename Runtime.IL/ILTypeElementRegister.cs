@@ -209,10 +209,16 @@ public partial class ILTypeElementRegister:ITypeElementRegister
         
         var list = new List<TypeElementRenderer>();
 
+       
+
         var sizeElement = factory.GetRender(typeof(int), "Size");
-        var sizeElementView = (UnityEditor.UIElements.IntegerField)sizeElement.element;
+        var sizeElementView = (IntXField)sizeElement.element;
         sizeElementView.RegisterValueChangedCallback(t => {
-            var newCount = t.newValue + 1;
+            if (int.TryParse( t.newValue,out var newValue))
+            {
+
+            }
+            var newCount = newValue + 1;
             var oldCount = foldout.childCount;
             if (newCount > oldCount)
             {
