@@ -2,13 +2,15 @@
 
 using System;
 using System.Collections.Generic;
-
+using UnityEngine.UIElements;
 
 public class RuntimeContext
 {
     private static RuntimeContext Instance_;
     private Dictionary<string, IMethodRepository> DelegationDict = new Dictionary<string, IMethodRepository>();
- 
+    private List<ITypeElementRegister> typeElementRegisters = new List<ITypeElementRegister>();
+    private Dictionary<Type, IMethodRender> methodRenderDict = new Dictionary<Type, IMethodRender>();
+    public TypeElementRendererFactory Factory { get; private set; }
     public static RuntimeContext Instance
     {
         get
@@ -26,7 +28,8 @@ public class RuntimeContext
         IMethodRepository invoker
         ) where T : IMethodInfoData
     {
-        TypeRenderUtils.Register<T>(NativeTypeElementRegister.Instance, methodRender);
+        typeElementRegisters.Add(typeElementRegister);
+        methodRenderDict[typeof(T)] = methodRender;
         var tmpType = typeof(T).Name;
         if (!DelegationDict.ContainsKey(tmpType))
         {
@@ -36,7 +39,13 @@ public class RuntimeContext
 
     public void Init()
     {
-        TypeRenderUtils.Init();
+        Factory = new TypeElementRendererFactory()
+            .Init(typeElementRegisters);
+       
+        foreach (var item in methodRenderDict.Values)
+        {
+            item.Factory = Factory;
+        }
     }
 
     public void GetMethodList(string methodType,string tab, List<IMethodInfoData> list) 
@@ -57,7 +66,6 @@ public class RuntimeContext
         }
     }
 
-
     public void Invoke(IMethodInfoData method)
     {
         if(DelegationDict.TryGetValue(method.TypeName,out var invoker))
@@ -71,6 +79,23 @@ public class RuntimeContext
         if (DelegationDict.TryGetValue(method.TypeName, out var invoker))
         {
             invoker.Invoke(method, param);
+        }
+    }
+
+
+    public void RenderMethod(ScrollView selectItemViews, IMethodInfoData method)
+    {
+        if (methodRenderDict.TryGetValue(method.GetType(), out var render))
+        {
+            render.RenderMethod(selectItemViews, method);
+        }
+    }
+
+    public void RenderMethodAndParams(ScrollView selectItemViews, IMethodInfoData method, object[] parameters)
+    {
+        if (methodRenderDict.TryGetValue(method.GetType(), out var render))
+        {
+            render.RenderMethodAndParams(selectItemViews, method, parameters);
         }
     }
 }

@@ -9,6 +9,7 @@ public class UIRuntimeCallV : EditorWindow
     private TabbedMenuController menuController;
     private StyleSheet styleSheet;
     ContainerData CacheContainer = null;
+    private RuntimeContext RuntimeContext = RuntimeContext.Instance;
     public void CreateGUI()
     {
         // Each editor window contains a root VisualElement object
@@ -166,7 +167,7 @@ public class UIRuntimeCallV : EditorWindow
                 scrollView.Clear();
                 if (methodInfo.ParamCount > 0)
                 {
-                    TypeRenderUtils.RenderMethod(scrollView, methodInfo);
+                    RuntimeContext.RenderMethod(scrollView, methodInfo);
                 }
 
                 var button = new Button();
@@ -210,7 +211,7 @@ public class UIRuntimeCallV : EditorWindow
                         Params = methodInfo.FromJson(collectCallMgr.CollectData.MethodParameters[methodInfo.Name].Item2);
                     }
 
-                    TypeRenderUtils.RenderMethodAndParams(scrollView, methodInfo, Params);
+                    RuntimeContext.RenderMethodAndParams(scrollView, methodInfo, Params);
                 }
 
 

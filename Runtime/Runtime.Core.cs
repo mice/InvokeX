@@ -3,14 +3,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine.UIElements;
 
-public interface IElementRendererFactory
-{
-    Dictionary<Type, System.Func<System.Type, string, TypeElementRenderer>> creatorDict { get; }
-    void RegisterType(Type type, System.Func<System.Type, string, TypeElementRenderer> creator);
-    TypeElementRenderer GetRender(Type type, string label);
-}
-
-
 public interface ITypeElementRegister
 {
     void Register(ITypeElementRendererFactory factory, Action<Type, System.Func<System.Type, string, TypeElementRenderer>> register);

@@ -11,6 +11,7 @@ public class TypeElementRendererFactory:ITypeElementRendererFactory
         {
             typeElementRegisters.Add(NativeTypeElementRegister.Instance);
         }
+
         foreach (var typeElementRegister in typeElementRegisters)
         {
             typeElementRegister.Register(this, RegisterType);

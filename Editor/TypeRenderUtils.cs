@@ -6,32 +6,8 @@ using UnityEngine.UIElements;
 public static partial class TypeRenderUtils
 {
     private static List<ITypeElementRegister> typeElementRegisters = new List<ITypeElementRegister>();
-    public static TypeElementRendererFactory factory = new TypeElementRendererFactory().Init(typeElementRegisters);
-    private static Dictionary<System.Type, IMethodRender> methodRenderDict = new Dictionary<System.Type, IMethodRender>();
-    public static void Init()
-    {
-        factory = new TypeElementRendererFactory()
-            .Init(typeElementRegisters);
-
-        var clrMethodRender = new CLRMethodRender(factory);
-
-        methodRenderDict[typeof(MethodCLR)] = clrMethodRender;
-        foreach(var item in methodRenderDict.Values)
-        {
-            item.Factory = factory;
-        }
-    }
-
-
-    public static void Register<T>(ITypeElementRegister typeElementRegister, IMethodRender methodRender) where T:IMethodInfoData
-    {
-        if (!typeElementRegisters.Contains(typeElementRegister))
-        {
-            typeElementRegisters.Add(typeElementRegister);
-        }
-
-        methodRenderDict[typeof(T)] = methodRender;
-    }
+    public static TypeElementRendererFactory factory => RuntimeContext.Instance.Factory;
+   
 
     public static void RenderParams(ScrollView selectItemViews, ParameterInfo[] parameterInfos,string methodName = "UnNamed")
     {
@@ -55,22 +31,5 @@ public static partial class TypeRenderUtils
         }
 
         selectItemViews.userData = container;
-    }
-
-
-    public static void RenderMethod(ScrollView selectItemViews, IMethodInfoData method)
-    {
-        if(methodRenderDict.TryGetValue(method.GetType(),out var render))
-        {
-            render.RenderMethod(selectItemViews, method);
-        }
-    }
-
-    public static void RenderMethodAndParams(ScrollView selectItemViews, IMethodInfoData method, object[] parameters)
-    {
-        if (methodRenderDict.TryGetValue(method.GetType(), out var render))
-        {
-            render.RenderMethodAndParams(selectItemViews, method, parameters);
-        }
     }
 }
