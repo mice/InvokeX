@@ -55,7 +55,6 @@ public class CMDRuntimeContext
         {
             repo.GetMethodList(tab, list);
         }
-     
     }
 
     public void GetCollectMethodDictionary(SerDict<string, KVPair> methodDict, List<IMethodInfoData> list)
@@ -81,7 +80,6 @@ public class CMDRuntimeContext
             invoker.Invoke(method, param);
         }
     }
-
 
     public void RenderMethod(ScrollView selectItemViews, IMethodInfoData method)
     {
