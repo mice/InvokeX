@@ -7,11 +7,6 @@ public class TypeElementRendererFactory:ITypeElementRendererFactory
 
     public TypeElementRendererFactory Init(List<ITypeElementRegister> typeElementRegisters)
     {
-        if (typeElementRegisters.Count == 0)
-        {
-            typeElementRegisters.Add(NativeTypeElementRegister.Instance);
-        }
-
         foreach (var typeElementRegister in typeElementRegisters)
         {
             typeElementRegister.Register(this, RegisterType);
