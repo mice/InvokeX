@@ -2,7 +2,6 @@
 using ILRuntime.CLR.TypeSystem;
 using System;
 using System.Collections.Generic;
-using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
 public partial class ILTypeElementRegister:ITypeElementRegister
@@ -211,7 +210,7 @@ public partial class ILTypeElementRegister:ITypeElementRegister
         var list = new List<TypeElementRenderer>();
 
         var sizeElement = factory.GetRender(typeof(int), "Size");
-        var sizeElementView = (IntegerField)sizeElement.element;
+        var sizeElementView = (UnityEditor.UIElements.IntegerField)sizeElement.element;
         sizeElementView.RegisterValueChangedCallback(t => {
             var newCount = t.newValue + 1;
             var oldCount = foldout.childCount;

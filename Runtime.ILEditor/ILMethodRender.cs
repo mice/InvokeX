@@ -1,6 +1,5 @@
 ﻿#if !DISABLE_ILRUNTIME
 using System.Collections.Generic;
-using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
 public class ILMethodRender :  IMethodRender
@@ -31,41 +30,6 @@ public class ILMethodRender :  IMethodRender
         {
             var info = parameterInfos[i];
             var renderer = GetILTypeView(info.ReflectionType, info.Name);
-            if (renderer != null)
-            {
-                selectItemViews.Add(renderer.element);
-            }
-            else
-            {
-                UnityEngine.Debug.LogError($"No Render Found:{info.ReflectionType}:name:{info.Name}");
-            }
-            container.list.Add(renderer);
-        }
-        selectItemViews.userData = container;
-    }
-
-    private void _RenderSetILMethodAndParams(ScrollView selectItemViews, MethodIL ilMethod,object[] Parameters)
-    {
-        selectItemViews.Clear();
-        List<ILRuntime.CLR.TypeSystem.IType> parameterInfos = ilMethod.Data.Parameters;
-        var container = new ParamRendererContainer();
-        for (int i = 0; i < parameterInfos.Count; i++)
-        {
-            var info = parameterInfos[i];
-            var renderer = GetILTypeView(info.ReflectionType, info.Name);
-            var strParams = Parameters[i].ToString();
-            int num = 0;
-            if (int.TryParse(strParams, out num) && renderer.element is IntegerField)
-            {
-                var intField = renderer.element as IntegerField;
-                intField.value = num;
-            }
-            else
-            {
-                var textField = renderer.element as TextField;
-                textField.value = strParams;
-            }
-
             if (renderer != null)
             {
                 selectItemViews.Add(renderer.element);

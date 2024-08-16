@@ -116,6 +116,7 @@ public class ILRuntimeCallManager:IMethodInvoker, IMethodRepository
             typeMethodDict[type] = RuntimeMethodTable.CreateFrom(type);
         }
     }
+
     public void GetTypeDictionary(Dictionary<string, string> typeDict)
     {
         foreach (var type in targetCallDict.Keys)
@@ -126,7 +127,6 @@ public class ILRuntimeCallManager:IMethodInvoker, IMethodRepository
             }
         }
     }
-
 
     public void GetMethodList(string typeName,List<IMethodInfoData> list)
     {
