@@ -2,18 +2,14 @@
 using System.Reflection;
 using UnityEngine.UIElements;
 
-
 public static partial class TypeRenderUtils
 {
-    private static List<ITypeElementRegister> typeElementRegisters = new List<ITypeElementRegister>();
-    public static TypeElementRendererFactory factory => RuntimeContext.Instance.Factory;
-   
-
-    public static void RenderParams(ScrollView selectItemViews, ParameterInfo[] parameterInfos,string methodName = "UnNamed")
+    public static void RenderParams(ScrollView selectItemViews, ParameterInfo[] parameterInfos, string methodName = "UnNamed")
     {
         selectItemViews.Clear();
         var container = new ParamRendererContainer();
         container.MethodName = methodName;
+        var factory = CMDRuntimeContext.Instance.Factory;
         for (int i = 0; i < parameterInfos.Length; i++)
         {
             var info = parameterInfos[i];

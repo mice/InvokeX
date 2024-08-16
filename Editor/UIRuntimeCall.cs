@@ -9,7 +9,7 @@ public class UIRuntimeCallV : EditorWindow
     private TabbedMenuController menuController;
     private StyleSheet styleSheet;
     ContainerData CacheContainer = null;
-    private RuntimeContext RuntimeContext = RuntimeContext.Instance;
+    private CMDRuntimeContext RuntimeContext = CMDRuntimeContext.Instance;
     public void CreateGUI()
     {
         // Each editor window contains a root VisualElement object
@@ -45,7 +45,7 @@ public class UIRuntimeCallV : EditorWindow
         InitTab(tabs, tabsContainer, tabContentContainer);
         menuController = new TabbedMenuController(root);
         menuController.RegisterTabCallbacks();
-        var context = RuntimeContext.Instance;
+        var context = CMDRuntimeContext.Instance;
         for (int i = 0; i < tabType.Count; i++)
         {
             if (tabType[i].Length ==  0)
@@ -139,7 +139,7 @@ public class UIRuntimeCallV : EditorWindow
 
     private void GetCollectMethod(string typeName,List<IMethodInfoData> list)
     {
-        var instance = RuntimeContext.Instance;
+        var instance = CMDRuntimeContext.Instance;
         var collectMgr = CollectCallManager.Instance;
         instance.GetCollectMethodDictionary(collectMgr.CollectData.MethodParameters, list);
     }
@@ -252,7 +252,7 @@ public class UIRuntimeCallV : EditorWindow
                 var typeName = target.TargetTypeName;
                 var methodInfo = target;
 
-                RuntimeContext.Instance.Invoke(methodInfo, arr);
+                CMDRuntimeContext.Instance.Invoke(methodInfo, arr);
                 var parametersStr = target.ToJson(arr);
                 var collectCallManager = CollectCallManager.Instance;
                 collectCallManager.AddCollectMethod(target.Name, typeName, parametersStr, target.TypeName);
@@ -283,7 +283,7 @@ public class UIRuntimeCallV : EditorWindow
                 collectCallManager.AddCollectMethod(methodName, typeName, parametersStr, target.TypeName);
 
                 var methodInfo = target;
-                RuntimeContext.Instance.Invoke(methodInfo, arr);
+                CMDRuntimeContext.Instance.Invoke(methodInfo, arr);
             }
         }
         catch (Exception exce)
@@ -566,7 +566,7 @@ public class ContainerData
             collectCallManager.AddCollectMethod(methodInfo.Name, methodInfo.TargetTypeName, string.Empty, typeName);
 
 
-            RuntimeContext.Instance.Invoke(methodInfo);
+            CMDRuntimeContext.Instance.Invoke(methodInfo);
         }
     }
 

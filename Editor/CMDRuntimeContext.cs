@@ -4,14 +4,14 @@ using System;
 using System.Collections.Generic;
 using UnityEngine.UIElements;
 
-public class RuntimeContext
+public class CMDRuntimeContext
 {
-    private static RuntimeContext Instance_;
+    private static CMDRuntimeContext Instance_;
     private Dictionary<string, IMethodRepository> DelegationDict = new Dictionary<string, IMethodRepository>();
     private List<ITypeElementRegister> typeElementRegisters = new List<ITypeElementRegister>();
     private Dictionary<Type, IMethodRender> methodRenderDict = new Dictionary<Type, IMethodRender>();
     public TypeElementRendererFactory Factory { get; private set; }
-    public static RuntimeContext Instance
+    public static CMDRuntimeContext Instance
     {
         get
         {
@@ -19,7 +19,7 @@ public class RuntimeContext
             {
                 return Instance_;
             }
-            Instance_ = new RuntimeContext();
+            Instance_ = new CMDRuntimeContext();
             return Instance_;
         }
     }
