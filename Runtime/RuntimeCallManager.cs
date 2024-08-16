@@ -83,7 +83,7 @@ public class RuntimeCallManager:IMethodInvoker, IMethodRepository
         GetMethodDictionary(typeName, methodTable);
         foreach (var item in methodTable.Values)
         {
-            list.Add(new MethodCLR(item));
+            list.Add(new CLRMethod(item));
         }
     }
 
@@ -104,7 +104,7 @@ public class RuntimeCallManager:IMethodInvoker, IMethodRepository
         _GetCollectMethodDictionary(methodDict,methodTable);
         foreach (var item in methodTable.Values)
         {
-            list.Add(new MethodCLR(item));
+            list.Add(new CLRMethod(item));
         }
     }
        

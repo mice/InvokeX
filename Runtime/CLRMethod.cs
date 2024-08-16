@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 
-public class MethodCLR : IMethodInfoData
+public class CLRMethod : IMethodInfoData
 {
     public string Name => Data.Name;
     public string TargetTypeName => Data.DeclaringType.Name;
-    public string TypeName => nameof(MethodCLR);
+    public string TypeName => nameof(CLRMethod);
     public int ParamCount { get; private set; }
     public MethodBase Data;
 
-    public MethodCLR(MethodBase method)
+    public CLRMethod(MethodBase method)
     {
         this.Data = method;
         this.ParamCount = method.GetParameters().Length;

@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -38,7 +37,6 @@ public class CLRMethodRender : IMethodRender
         int i = 0;
         var dd = selectItemViews.userData as ParamRendererContainer;
 
-        var tmpTextBaseType = typeof(TextValueField<>);
         foreach (var child in children)
         {
             var strParams = Params[i].ToString();

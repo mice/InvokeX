@@ -135,7 +135,7 @@ public class ILRuntimeCallManager:IMethodInvoker, IMethodRepository
 
         foreach (var method in methodTable)
         {
-            list.Add(new MethodIL(method.Value));
+            list.Add(new ILMethod(method.Value));
         }
     }
 
@@ -157,7 +157,7 @@ public class ILRuntimeCallManager:IMethodInvoker, IMethodRepository
 
         foreach (var item in ilMethodTable.Values)
         {
-            list.Add(new MethodIL(item));
+            list.Add(new ILMethod(item));
         }
     }
 

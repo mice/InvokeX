@@ -4,15 +4,15 @@ using System.Reflection;
 
 
 #if !DISABLE_ILRUNTIME
-public class MethodIL : IMethodInfoData
+public class ILMethod : IMethodInfoData
 {
     public string Name => Data.Name;
     public string TargetTypeName => Data.DeclearingType.Name;
-    public string TypeName => nameof(MethodIL);
+    public string TypeName => nameof(ILMethod);
     public int ParamCount { get; private set; }
     public ILRuntime.CLR.Method.IMethod Data;
 
-    public MethodIL(ILRuntime.CLR.Method.IMethod method)
+    public ILMethod(ILRuntime.CLR.Method.IMethod method)
     {
         this.Data = method;
         this.ParamCount = method.ParameterCount;

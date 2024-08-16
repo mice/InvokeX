@@ -13,15 +13,15 @@ public class ILMethodRender :  IMethodRender
 
     public void RenderMethodAndParams(ScrollView selectItemViews, IMethodInfoData method, object[] parameters)
     {
-        RenderMethodAndParams(selectItemViews,method as MethodIL,parameters);
+        RenderMethodAndParams(selectItemViews,method as ILMethod,parameters);
     }
 
     public void RenderMethod(ScrollView selectItemViews, IMethodInfoData method)
     {
-        RenderILMethod(selectItemViews, method as MethodIL);
+        RenderILMethod(selectItemViews, method as ILMethod);
     }
 
-    public void RenderILMethod(ScrollView selectItemViews, MethodIL methodIL)
+    public void RenderILMethod(ScrollView selectItemViews, ILMethod methodIL)
     {
         selectItemViews.Clear();
         List<ILRuntime.CLR.TypeSystem.IType> parameterInfos = methodIL.Data.Parameters;

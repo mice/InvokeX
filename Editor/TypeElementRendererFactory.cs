@@ -90,21 +90,6 @@ public class TypeElementRendererFactory:ITypeElementRendererFactory
 
         var context = CMDRuntimeContext.Instance;
         return context.UnHandleType(type, creatorDict,label);
-#if !DISABLE_ILRUNTIME
-        if (type.UnderlyingSystemType == typeof(ILRuntime.Runtime.Intepreter.ILTypeInstance))
-        {
-            if (creatorDict.TryGetValue(typeof(ILRuntime.Runtime.Intepreter.ILTypeInstance), out var uObjCreator))
-            {
-                return uObjCreator.Invoke(type, label);
-            }
-        }
-
-        var ilTypeType = typeof(ILRuntime.CLR.TypeSystem.ILType);
-        var ilRuntimeTypeType = typeof(ILRuntime.Reflection.ILRuntimeType);
-        var ilInstType = typeof(ILRuntime.Runtime.Intepreter.ILTypeInstance);
-        UnityEngine.Debug.LogError($"type:{type},ilType:{ilTypeType},ilRuntimeType:{ilRuntimeTypeType},ilInstType:{ilInstType}");
-#endif
-        return null;
     }
 }
 
