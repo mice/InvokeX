@@ -96,4 +96,17 @@ public class CMDRuntimeContext
             render.RenderMethodAndParams(selectItemViews, method, parameters);
         }
     }
+
+    public TypeElementRenderer UnHandleType(System.Type type, Dictionary<System.Type, System.Func<System.Type, string, TypeElementRenderer>> creatorDict, string label)
+    {
+        foreach (var item in DelegationDict.Values)
+        {
+            var render = item.UnHandleType(type, creatorDict, label);
+            if(render!= null)
+            {
+                return render;
+            }
+        }
+        return null;
+    }
 }

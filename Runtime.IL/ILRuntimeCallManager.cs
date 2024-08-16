@@ -222,5 +222,24 @@ public class ILRuntimeCallManager:IMethodInvoker, IMethodRepository
             typeName = "Protocal";
         Invoke(typeName, method.Name, param);
     }
+
+    public TypeElementRenderer UnHandleType(System.Type type, Dictionary<System.Type, System.Func<System.Type, string, TypeElementRenderer>> creatorDict,string label)
+    {
+#if !DISABLE_ILRUNTIME
+        if (type.UnderlyingSystemType == typeof(ILRuntime.Runtime.Intepreter.ILTypeInstance))
+        {
+            if (creatorDict.TryGetValue(typeof(ILRuntime.Runtime.Intepreter.ILTypeInstance), out var uObjCreator))
+            {
+                return uObjCreator.Invoke(type, label);
+            }
+        }
+
+        var ilTypeType = typeof(ILRuntime.CLR.TypeSystem.ILType);
+        var ilRuntimeTypeType = typeof(ILRuntime.Reflection.ILRuntimeType);
+        var ilInstType = typeof(ILRuntime.Runtime.Intepreter.ILTypeInstance);
+        UnityEngine.Debug.LogError($"type:{type},ilType:{ilTypeType},ilRuntimeType:{ilRuntimeTypeType},ilInstType:{ilInstType}");
+#endif
+        return null;
+    }
 }
 #endif

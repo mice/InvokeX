@@ -222,4 +222,9 @@ public class RuntimeCallManager:IMethodInvoker, IMethodRepository
         }
         return null;
     }
+
+    public TypeElementRenderer UnHandleType(System.Type type, Dictionary<Type, System.Func<System.Type, string, TypeElementRenderer>> creatorDict, string label)
+    {
+        return null;
+    }
 }

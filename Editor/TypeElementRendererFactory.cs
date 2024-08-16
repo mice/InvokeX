@@ -70,8 +70,6 @@ public class TypeElementRendererFactory:ITypeElementRendererFactory
             }
         }
 
-
-
         var uObjectType = typeof(UnityEngine.Object);
         if (type.IsAssignableFrom(uObjectType))
         {
@@ -89,6 +87,9 @@ public class TypeElementRendererFactory:ITypeElementRendererFactory
                 return uObjCreator.Invoke(type, label);
             }
         }
+
+        var context = CMDRuntimeContext.Instance;
+        return context.UnHandleType(type, creatorDict,label);
 #if !DISABLE_ILRUNTIME
         if (type.UnderlyingSystemType == typeof(ILRuntime.Runtime.Intepreter.ILTypeInstance))
         {
