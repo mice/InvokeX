@@ -52,7 +52,8 @@ public class NativeTypeElementRegister : ITypeElementRegister
 
         renderer.ToValueFunc = (r) =>
         {
-            return System.Convert.ToSByte(tField.value);
+            int.TryParse(tField.value, out var sValue);
+            return System.Convert.ToSByte(sValue);
         };
 
         renderer.SetValueAction = (obj) =>
@@ -67,14 +68,16 @@ public class NativeTypeElementRegister : ITypeElementRegister
     {
         var renderer = new TypeElementRenderer();
         renderer.type = typeof(byte);
-        renderer.element = new IntegerField(paramName);
+        var tField = new IntegerField(paramName);
+        renderer.element = tField;
+
         renderer.ToValueFunc = (r) =>
         {
-            return (byte)((IntegerField)renderer.element).value;
+            return (byte)tField.value;
         };
         renderer.SetValueAction = (obj) =>
         {
-            ((IntegerField)renderer.element).value = System.Convert.ToInt32(obj);
+            tField.value = System.Convert.ToInt32(obj);
         };
         return renderer;
     }
@@ -83,14 +86,16 @@ public class NativeTypeElementRegister : ITypeElementRegister
     {
         var renderer = new TypeElementRenderer();
         renderer.type = typeof(short);
-        renderer.element = new IntegerField(paramName);
+        var tField = new IntegerField(paramName);
+        renderer.element = tField;
         renderer.ToValueFunc = (r) =>
         {
-            return (short)((IntegerField)renderer.element).value;
+            return (short)tField.value;
         };
+
         renderer.SetValueAction = (obj) =>
         {
-            ((IntegerField)renderer.element).value = System.Convert.ToInt32(obj);
+            tField.value = System.Convert.ToInt32(obj);
         };
         return renderer;
     }
@@ -99,14 +104,15 @@ public class NativeTypeElementRegister : ITypeElementRegister
     {
         var renderer = new TypeElementRenderer();
         renderer.type = typeof(ushort);
-        renderer.element = new IntegerField(paramName);
+        var tField = new IntegerField(paramName);
+        renderer.element = tField;
         renderer.ToValueFunc = (r) =>
         {
-            return (ushort)((IntegerField)renderer.element).value;
+            return (ushort)tField.value;
         };
         renderer.SetValueAction = (obj) =>
         {
-            ((IntegerField)renderer.element).value = System.Convert.ToInt32(obj);
+            tField.value = System.Convert.ToInt32(obj);
         };
         return renderer;
     }
@@ -134,14 +140,15 @@ public class NativeTypeElementRegister : ITypeElementRegister
     {
         var renderer = new TypeElementRenderer();
         renderer.type = typeof(uint);
-        renderer.element = new IntegerField(paramName);
+        var fieldView = new IntegerField(paramName);
+        renderer.element = fieldView;
         renderer.ToValueFunc = (r) =>
         {
-            return (uint)((IntegerField)renderer.element).value;
+            return (uint)fieldView.value;
         };
         renderer.SetValueAction = (obj) =>
         {
-            ((IntegerField)renderer.element).value = System.Convert.ToInt32(obj);
+            fieldView.value = System.Convert.ToInt32(obj);
         };
         return renderer;
     }
@@ -150,14 +157,16 @@ public class NativeTypeElementRegister : ITypeElementRegister
     {
         var renderer = new TypeElementRenderer();
         renderer.type = typeof(long);
-        renderer.element = new LongField(paramName);
+        var fieldView = new LongField(paramName);
+        renderer.element = fieldView;
         renderer.ToValueFunc = (r) =>
         {
-            return ((LongField)renderer.element).value;
+            return fieldView.value;
         };
+
         renderer.SetValueAction = (obj) =>
         {
-            ((LongField)renderer.element).value = System.Convert.ToInt64(obj);
+            fieldView.value = System.Convert.ToInt64(obj);
         };
         return renderer;
     }
@@ -166,15 +175,16 @@ public class NativeTypeElementRegister : ITypeElementRegister
     {
         var renderer = new TypeElementRenderer();
         renderer.type = typeof(ulong);
-        renderer.element = new LongField(paramName);
+        var fieldView = new LongField(paramName);
+        renderer.element = fieldView;
         renderer.ToValueFunc = (r) =>
         {
-            return (ulong)((LongField)renderer.element).value;
+            return (ulong)fieldView.value;
         };
 
         renderer.SetValueAction = (obj) =>
         {
-            ((LongField)renderer.element).value = System.Convert.ToInt64(obj);
+            fieldView.value = System.Convert.ToInt64(obj);
         };
         return renderer;
     }
@@ -183,14 +193,15 @@ public class NativeTypeElementRegister : ITypeElementRegister
     {
         var renderer = new TypeElementRenderer();
         renderer.type = typeof(float);
-        renderer.element = new FloatField(paramName);
+        var fieldView = new FloatField(paramName);
+        renderer.element = fieldView;
         renderer.ToValueFunc = (r) =>
         {
-            return (float)((FloatField)renderer.element).value;
+            return (float)fieldView.value;
         };
         renderer.SetValueAction = (obj) =>
         {
-            ((FloatField)renderer.element).value = System.Convert.ToSingle(obj);
+            fieldView.value = System.Convert.ToSingle(obj);
         };
         return renderer;
     }
@@ -199,14 +210,15 @@ public class NativeTypeElementRegister : ITypeElementRegister
     {
         var renderer = new TypeElementRenderer();
         renderer.type = typeof(Double);
-        renderer.element = new DoubleField(paramName);
+        var fieldView = new DoubleField(paramName);
+        renderer.element = fieldView;
         renderer.ToValueFunc = (r) =>
         {
-            return ((DoubleField)renderer.element).value;
+            return fieldView.value;
         };
         renderer.SetValueAction = (obj) =>
         {
-            ((DoubleField)renderer.element).value = System.Convert.ToDouble(obj);
+            fieldView.value = System.Convert.ToDouble(obj);
         };
         return renderer;
     }
@@ -215,14 +227,15 @@ public class NativeTypeElementRegister : ITypeElementRegister
     {
         var renderer = new TypeElementRenderer();
         renderer.type = typeof(bool);
-        renderer.element = new Toggle(paramName);
+        var fieldView = new Toggle(paramName);
+        renderer.element = fieldView;
         renderer.ToValueFunc = (r) =>
         {
-            return (bool)((Toggle)renderer.element).value;
+            return fieldView.value;
         };
         renderer.SetValueAction = (obj) =>
         {
-            ((Toggle)renderer.element).value = System.Convert.ToBoolean(obj);
+            fieldView.value = System.Convert.ToBoolean(obj);
         };
         return renderer;
     }
@@ -231,16 +244,16 @@ public class NativeTypeElementRegister : ITypeElementRegister
     {
         var renderer = new TypeElementRenderer();
         renderer.type = typeof(string);
-        var textElment = new TextField(paramName);
-        renderer.element = textElment;
+        var fieldView = new TextField(paramName);
+        renderer.element = fieldView;
         renderer.ToValueFunc = (r) =>
         {
-            return ((TextField)renderer.element).text;
+            return fieldView.text;
         };
 
         renderer.SetValueAction = (obj) =>
         {
-            ((TextField)renderer.element).value = System.Convert.ToString(obj);
+            fieldView.value = System.Convert.ToString(obj);
         };
         return renderer;
     }
@@ -249,14 +262,15 @@ public class NativeTypeElementRegister : ITypeElementRegister
     {
         var renderer = new TypeElementRenderer();
         renderer.type = typeof(Color);
-        renderer.element = new ColorField(paramName);
+        var fieldView = new ColorField(paramName);
+        renderer.element = fieldView;
         renderer.ToValueFunc = (r) =>
         {
-            return ((ColorField)renderer.element).value;
+            return fieldView.value;
         };
         renderer.SetValueAction = (obj) =>
         {
-            ((ColorField)renderer.element).value = (Color)obj;
+            fieldView.value = (Color)obj;
         };
         return renderer;
     }
@@ -265,15 +279,16 @@ public class NativeTypeElementRegister : ITypeElementRegister
     {
         var renderer = new TypeElementRenderer();
         renderer.type = typeof(Vector2);
-        renderer.element = new Vector2Field(paramName);
+        var fieldView = new Vector2Field(paramName);
+        renderer.element = fieldView;
         renderer.ToValueFunc = (r) =>
         {
-            return ((Vector2Field)renderer.element).value;
+            return fieldView.value;
         };
 
         renderer.SetValueAction = (obj) =>
         {
-            ((Vector2Field)renderer.element).value = (Vector2)obj;
+            fieldView.value = (Vector2)obj;
         };
         return renderer;
     }
@@ -282,15 +297,16 @@ public class NativeTypeElementRegister : ITypeElementRegister
     {
         var renderer = new TypeElementRenderer();
         renderer.type = typeof(Vector3);
-        renderer.element = new Vector3Field(paramName);
+        var fieldView = new Vector3Field(paramName);
+        renderer.element = fieldView;
         renderer.ToValueFunc = (r) =>
         {
-            return ((Vector3Field)renderer.element).value;
+            return fieldView.value;
         };
 
         renderer.SetValueAction = (obj) =>
         {
-            ((Vector3Field)renderer.element).value = (Vector3)obj;
+            fieldView.value = (Vector3)obj;
         };
         return renderer;
     }
@@ -299,15 +315,16 @@ public class NativeTypeElementRegister : ITypeElementRegister
     {
         var renderer = new TypeElementRenderer();
         renderer.type = typeof(Vector4);
-        renderer.element = new Vector4Field(paramName);
+        var fieldView = new Vector4Field(paramName);
+        renderer.element = fieldView;
         renderer.ToValueFunc = (r) =>
         {
-            return ((Vector4Field)renderer.element).value;
+            return fieldView.value;
         };
 
         renderer.SetValueAction = (obj) =>
         {
-            ((Vector4Field)renderer.element).value = (Vector4)obj;
+            fieldView.value = (Vector4)obj;
         };
         return renderer;
     }
@@ -316,15 +333,16 @@ public class NativeTypeElementRegister : ITypeElementRegister
     {
         var renderer = new TypeElementRenderer();
         renderer.type = typeof(Vector2Int);
-        renderer.element = new Vector2IntField(paramName);
+        var fieldView = new Vector2IntField(paramName);
+        renderer.element = fieldView;
         renderer.ToValueFunc = (r) =>
         {
-            return ((Vector2IntField)renderer.element).value;
+            return fieldView.value;
         };
 
         renderer.SetValueAction = (obj) =>
         {
-            ((Vector2IntField)renderer.element).value = (Vector2Int)obj;
+            fieldView.value = (Vector2Int)obj;
         };
 
         return renderer;
@@ -334,15 +352,16 @@ public class NativeTypeElementRegister : ITypeElementRegister
     {
         var renderer = new TypeElementRenderer();
         renderer.type = typeof(Vector3Int);
-        renderer.element = new Vector3IntField(paramName);
+        var fieldView = new Vector3IntField(paramName);
+        renderer.element = fieldView;
         renderer.ToValueFunc = (r) =>
         {
-            return ((Vector3IntField)renderer.element).value;
+            return fieldView.value;
         };
 
         renderer.SetValueAction = (obj) =>
         {
-            ((Vector3IntField)renderer.element).value = (Vector3Int)obj;
+            fieldView.value = (Vector3Int)obj;
         };
         return renderer;
     }
@@ -351,16 +370,16 @@ public class NativeTypeElementRegister : ITypeElementRegister
     {
         var renderer = new TypeElementRenderer();
         renderer.type = typeof(Rect);
-
-        renderer.element = new RectField(paramName);
+        var fieldView = new RectField(paramName);
+        renderer.element = fieldView;
         renderer.ToValueFunc = (r) =>
         {
-            return ((RectField)renderer.element).value;
+            return fieldView.value;
         };
 
         renderer.SetValueAction = (obj) =>
         {
-            ((RectField)renderer.element).value = (Rect)obj;
+            fieldView.value = (Rect)obj;
         };
         return renderer;
     }
@@ -369,16 +388,16 @@ public class NativeTypeElementRegister : ITypeElementRegister
     {
         var renderer = new TypeElementRenderer();
         renderer.type = typeof(RectInt);
-
-        renderer.element = new RectIntField(paramName);
+        var fieldView = new RectIntField(paramName);
+        renderer.element = fieldView;
         renderer.ToValueFunc = (r) =>
         {
-            return ((RectIntField)renderer.element).value;
+            return fieldView.value;
         };
 
         renderer.SetValueAction = (obj) =>
         {
-            ((RectIntField)renderer.element).value = (RectInt)obj;
+            fieldView.value = (RectInt)obj;
         };
         return renderer;
     }
