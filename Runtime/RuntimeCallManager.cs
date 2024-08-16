@@ -77,6 +77,16 @@ public class RuntimeCallManager:IMethodInvoker, IMethodRepository
         }
     }
 
+    public void GetMethodList(string typeName,List<IMethodInfoData> list)
+    {
+        var methodTable = new Dictionary<string, System.Reflection.MethodBase>();
+        GetMethodDictionary(typeName, methodTable);
+        foreach (var item in methodTable.Values)
+        {
+            list.Add(new MethodCLR(item));
+        }
+    }
+
     public void GetMethodDictionary(string typeName,Dictionary<string, MethodBase> typeDict)
     {
         if (targetCallDict.TryGetValue(typeName, out var _target) && typeMethodDict.TryGetValue(_target.Item1, out var methodTable))

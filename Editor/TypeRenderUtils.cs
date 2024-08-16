@@ -29,10 +29,6 @@ public static partial class TypeRenderUtils
         {
             typeElementRegisters.Add(typeElementRegister);
         }
-        else
-        {
-            UnityEngine.Debug.LogWarning("Dup Add!");
-        }
 
         methodRenderDict[typeof(MethodCLR)] = methodRender;
     }

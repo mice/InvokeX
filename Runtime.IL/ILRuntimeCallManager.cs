@@ -116,6 +116,28 @@ public class ILRuntimeCallManager:IMethodInvoker, IMethodRepository
             typeMethodDict[type] = RuntimeMethodTable.CreateFrom(type);
         }
     }
+    public void GetTypeDictionary(Dictionary<string, string> typeDict)
+    {
+        foreach (var type in targetCallDict.Keys)
+        {
+            if (!typeDict.TryGetValue(type, out var _target))
+            {
+                typeDict[type] = targetCallDict[type].Item1.Name;
+            }
+        }
+    }
+
+
+    public void GetMethodList(string typeName,List<IMethodInfoData> list)
+    {
+        var methodTable = new Dictionary<string, ILRuntime.CLR.Method.IMethod>();
+        GetMethodDictionary(typeName, methodTable);
+
+        foreach (var method in methodTable)
+        {
+            list.Add(new MethodIL(method.Value));
+        }
+    }
 
     public void GetMethodDictionary(string typeName,Dictionary<string,IMethod> methodDict)
     {

@@ -32,15 +32,21 @@ public class RuntimeContext
         {
             DelegationDict.Add(tmpType, invoker);
         }
-        else
-        {
-            UnityEngine.Debug.LogWarning("Dup Add!");
-        }
     }
 
     public void Init()
     {
         TypeRenderUtils.Init();
+    }
+
+    public void GetMethodList(string methodType,string tab, List<IMethodInfoData> list) 
+    {
+        var typeName = methodType;
+        if(DelegationDict.TryGetValue(typeName,out var repo))
+        {
+            repo.GetMethodList(tab, list);
+        }
+     
     }
 
     public void GetCollectMethodDictionary(SerDict<string, KVPair> methodDict, List<IMethodInfoData> list)

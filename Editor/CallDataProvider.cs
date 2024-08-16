@@ -4,7 +4,7 @@ using UnityEngine;
 
 public interface ICallDataBuilder
 {
-    void Build(Dictionary<string, Type> typeDict, Dictionary<string, System.Action> actionList);
+    void Build(Dictionary<(string, string), Type> typeDict, Dictionary<string, System.Action> actionList);
 }
 
 /// <summary>
@@ -12,7 +12,7 @@ public interface ICallDataBuilder
 /// </summary>
 public class CallDataProvider
 {
-    public Dictionary<string, Type> typeDict = new Dictionary<string, Type>();
+    private Dictionary<(string,string), Type> typeDict = new Dictionary<(string, string), Type>();
     public Dictionary<string, System.Action> actionList = new Dictionary<string, Action>();
     public static ICallDataBuilder Builder;
     public void Test()
@@ -28,31 +28,23 @@ public class CallDataProvider
         }
     }
 
-    public void CreateTabs(List<string> tabs, List<bool> tabTypes)
+    public void CreateTabs(List<string> tabs, List<string> tabTypes)
     {
         tabs.Clear();
         tabTypes.Clear();
 
-        AddILTab("CollectMethods", tabs, tabTypes);
-        tabTypes[tabTypes.Count - 1] = true;
+        AddILTab("CollectMethods","", tabs, tabTypes);
 
        
         foreach(var item in typeDict.Keys)
         {
-            tabs.Add(item);
-            tabTypes.Add(true);
+            AddILTab(item.Item2, item.Item1, tabs, tabTypes);
         }
-        
-
-        AddILTab("Protocal", tabs, tabTypes);
-        AddILTab("ViewUtils", tabs, tabTypes);
-        AddILTab("TestUtils", tabs, tabTypes);
-        AddILTab("EditorUtils", tabs, tabTypes);
     }
 
-    private void AddILTab(string tab, List<string> tabs, List<bool> tabTypes)
+    private void AddILTab(string tab, string methodType,List<string> tabs, List<string> tabTypes)
     {
         tabs.Add(tab);
-        tabTypes.Add(false);
+        tabTypes.Add(methodType);
     }
 }

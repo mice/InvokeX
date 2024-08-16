@@ -8,7 +8,7 @@ public class UIRuntimeCallV : EditorWindow
 {
     private TabbedMenuController menuController;
     private StyleSheet styleSheet;
-    ContainerData<IMethodInfoData> CacheContainer = null;
+    ContainerData CacheContainer = null;
     public void CreateGUI()
     {
         // Each editor window contains a root VisualElement object
@@ -29,14 +29,12 @@ public class UIRuntimeCallV : EditorWindow
         VisualElement labelFromUXML = visualTree.CloneTree();
         root.Add(labelFromUXML);
 
-        // A stylesheet can be added to a VisualElement.
-        // The style will be applied to the VisualElement and all of its children.
         styleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>(System.IO.Path.Combine(UIRuntimeCallSetting.Fold, "UIRuntimeCall.uss"));
         root.styleSheets.Add(styleSheet);
     }
 
 
-    private void _CreateTabs(VisualElement root, List<string> tabs , List<bool> tabType)
+    private void _CreateTabs(VisualElement root, List<string> tabs , List<string> tabType)
     {
         var tabsContainer = root.Q<VisualElement>("tabs");
         var tabContentContainer = root.Q<VisualElement>("tabContent");
@@ -46,30 +44,22 @@ public class UIRuntimeCallV : EditorWindow
         InitTab(tabs, tabsContainer, tabContentContainer);
         menuController = new TabbedMenuController(root);
         menuController.RegisterTabCallbacks();
-
+        var context = RuntimeContext.Instance;
         for (int i = 0; i < tabType.Count; i++)
         {
-            if (i != 0 && tabType[i])
+            if (tabType[i].Length ==  0)
             {
-                new ContainerData<MethodCLR>(styleSheet, OnSelectItem).InitContainer(root, tabs[i], GetCLR);
-            }
-            else if (i == 0 && tabType[i])
-            {
-                CacheContainer = new ContainerData<IMethodInfoData>(styleSheet, OnSelectItem2).InitContainer(root, tabs[i], GetCollectMethod);
+                CacheContainer = new ContainerData(styleSheet, OnSelectItem2).InitContainer(root, tabs[i], GetCollectMethod);
             }
             else
             {
-#if !DISABLE_ILRUNTIME
-                new ContainerData<MethodIL>(styleSheet, OnSelectItem).InitContainer(root, tabs[i], GetIL);
-#endif
+                new ContainerData(styleSheet, OnSelectItem).InitContainer(root, tabs[i], (t1, t2) => {
+                    context.GetMethodList(tabType[i], tabs[i], t2);
+                });
             }
         }
     }
 
-    private void XXContainerData<T>()where T: IMethodInfoData
-    {
-
-    }
 
     private void _CreateUI(VisualElement root)
     {
@@ -120,7 +110,7 @@ public class UIRuntimeCallV : EditorWindow
         try
         {
             var tabs = new List<string>();
-            var tabTypes = new List<bool>();
+            var tabTypes = new List<string>();
             callDataProvider.CreateTabs(tabs,tabTypes);
             _CreateTabs(root, tabs, tabTypes);
         }
@@ -146,40 +136,12 @@ public class UIRuntimeCallV : EditorWindow
         }
     }
 
-    private void GetCLR(string tab, List<MethodCLR> list)
-    {
-        var targetMgr = RuntimeCallManager.Instance;
-        var methodTable = new Dictionary<string, System.Reflection.MethodBase>();
-        targetMgr.GetMethodDictionary(tab, methodTable);
-        foreach(var item in methodTable.Values)
-        {
-            list.Add(new MethodCLR(item));
-        }
-    }
-
     private void GetCollectMethod(string typeName,List<IMethodInfoData> list)
     {
         var instance = RuntimeContext.Instance;
         var collectMgr = CollectCallManager.Instance;
         instance.GetCollectMethodDictionary(collectMgr.CollectData.MethodParameters, list);
     }
-
-#if !DISABLE_ILRUNTIME
-    private void GetIL(string tab, List<MethodIL> list)
-    {
-        if (!Application.isPlaying)
-            return;
-
-        var targetMgr = ILRuntimeCallManager.Instance;
-        var methodTable = new Dictionary<string, ILRuntime.CLR.Method.IMethod>();
-        targetMgr.GetMethodDictionary(tab, methodTable);
-
-        foreach(var method in methodTable)
-        {
-            list.Add(new MethodIL(method.Value));
-        }
-    }
-#endif
 
     private void OnSelectItem(string tab,System.Object selections)
     {
@@ -379,11 +341,10 @@ public class UIRuntimeCallV : EditorWindow
 
 
 
-public class ContainerData<T>
-    where T:IMethodInfoData
+public class ContainerData
 {
     public StyleSheet styleSheet;
-    private List<T> list;
+    private List<IMethodInfoData> list;
     ListView contListView;
     VisualElement rootVE;
 
@@ -395,7 +356,7 @@ public class ContainerData<T>
         this.OnSelectItem = onSelectItem;
     }
 
-    public ContainerData<T> InitContainer(VisualElement root, string tab, System.Action<string, List<T>> GetT)
+    public ContainerData InitContainer(VisualElement root, string tab, System.Action<string, List<IMethodInfoData>> GetT)
     {
         this.tab = tab;
         rootVE = root;
@@ -419,7 +380,7 @@ public class ContainerData<T>
         listView.onItemsChosen += _OnMethodChoose;
 #endif
 
-        list = new List<T>();
+        list = new List<IMethodInfoData>();
         GetT(tab, list);
 
         listView.itemsSource = list;
@@ -431,7 +392,7 @@ public class ContainerData<T>
         return this;
     }
 
-    public void ResetContainer(string tab, System.Action<string, List<T>> GetT) {
+    public void ResetContainer(string tab, System.Action<string, List<IMethodInfoData>> GetT) {
         contListView.Clear();
         contListView.AddToClassList("TabContainerListView");
         contListView.name = tab + "ListView";
@@ -445,7 +406,7 @@ public class ContainerData<T>
 #if UNITY_2021_3
         contListView.onItemsChosen += _OnMethodChoose;
 #endif
-        list = new List<T>();
+        list = new List<IMethodInfoData>();
         GetT(tab, list);
         contListView.itemsSource = list;
         contListView.styleSheets.Add(styleSheet);

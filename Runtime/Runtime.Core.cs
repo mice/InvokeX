@@ -61,5 +61,6 @@ public interface IMethodRepository:IMethodInvoker
 {
     void GetCollectMethodDictionary(SerDict<string, KVPair> methodDict, List<IMethodInfoData> list);
 
+    void GetMethodList(string typeName, List<IMethodInfoData> list);
 }
 
