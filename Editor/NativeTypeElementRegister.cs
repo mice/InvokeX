@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
+using XInspect;
 
 public class NativeTypeElementRegister : ITypeElementRegister
 {
@@ -507,7 +508,7 @@ public class NativeTypeElementRegister : ITypeElementRegister
     public static TypeElementRenderer UObjectRenderer(System.Type targetType, string paramName)
     {
         var renderer = new TypeElementRenderer();
-        renderer.type = typeof(int);
+        renderer.type = typeof(UnityEngine.Object);
         renderer.element = new ObjectField(paramName);
         renderer.ToValueFunc = (r) =>
         {

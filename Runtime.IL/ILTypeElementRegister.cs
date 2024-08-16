@@ -3,7 +3,7 @@ using ILRuntime.CLR.TypeSystem;
 using System;
 using System.Collections.Generic;
 using UnityEngine.UIElements;
-
+using XInspect;
 public partial class ILTypeElementRegister:ITypeElementRegister
 {
     public static ILTypeElementRegister Instance { get; private set; } = new ILTypeElementRegister();
@@ -208,8 +208,6 @@ public partial class ILTypeElementRegister:ITypeElementRegister
         foldout.text = paramName;
         
         var list = new List<TypeElementRenderer>();
-
-       
 
         var sizeElement = factory.GetRender(typeof(int), "Size");
         var sizeElementView = (IntXField)sizeElement.element;
