@@ -12,14 +12,39 @@ public class CLRMethodRender : IMethodRender
     public void RenderMethod(ScrollView selectItemViews, IMethodInfoData method)
     {
         ParameterInfo[] parameterInfos = method.GetParameters();
-        TypeRenderUtils.RenderParams(selectItemViews, parameterInfos);
+        RenderParams(selectItemViews, parameterInfos);
     }
 
     public void RenderMethodAndParams(ScrollView selectItemViews, IMethodInfoData method, object[] parameters)
     {
         ParameterInfo[] parameterInfos = method.GetParameters();
-        TypeRenderUtils.RenderParams(selectItemViews, parameterInfos);
+        RenderParams(selectItemViews, parameterInfos);
         RenderLogParams(selectItemViews, parameterInfos, parameters);
+    }
+
+    public void RenderParams(ScrollView selectItemViews, ParameterInfo[] parameterInfos, string methodName = "UnNamed")
+    {
+        selectItemViews.Clear();
+        var container = new ParamRendererContainer();
+        container.MethodName = methodName;
+        var factory = Factory;
+        for (int i = 0; i < parameterInfos.Length; i++)
+        {
+            var info = parameterInfos[i];
+            var paramAttr = info.GetCustomAttribute<ParamAttribute>();
+            var renderer = factory.GetRender(info.ParameterType, info.Name);
+            if (renderer != null)
+            {
+                selectItemViews.Add(renderer.element);
+            }
+            else
+            {
+                UnityEngine.Debug.LogError($"No Render Found:{info.ParameterType}:name:{info.Name}");
+            }
+            container.list.Add(renderer);
+        }
+
+        selectItemViews.userData = container;
     }
 
 
