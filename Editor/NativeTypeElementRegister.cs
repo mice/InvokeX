@@ -124,38 +124,12 @@ public class NativeTypeElementRegister : ITypeElementRegister
 
     public static TypeElementRenderer IntRenderer(System.Type targetType, string paramName)
     {
-        var renderer = new TypeElementRenderer();
-        renderer.type = typeof(int);
-        var fieldView = new IntXField(paramName);
-        renderer.element = fieldView;
-        renderer.ToValueFunc = (r) =>
-        {
-            int.TryParse(fieldView.value, out var intValue);
-            return intValue;
-        };
-
-        renderer.SetValueAction = (obj) =>
-        {
-            fieldView.value = System.Convert.ToInt32(obj).ToString();
-        };
-        return renderer;
+        return new NumberElementRenderer().InitInt(paramName);
     }
 
     public static TypeElementRenderer UIntRenderer(System.Type targetType, string paramName)
     {
-        var renderer = new TypeElementRenderer();
-        renderer.type = typeof(uint);
-        var fieldView = new IntegerField(paramName);
-        renderer.element = fieldView;
-        renderer.ToValueFunc = (r) =>
-        {
-            return (uint)fieldView.value;
-        };
-        renderer.SetValueAction = (obj) =>
-        {
-            fieldView.value = System.Convert.ToInt32(obj);
-        };
-        return renderer;
+        return new NumberElementRenderer().InitUInt(paramName);
     }
 
     public static TypeElementRenderer LongRenderer(System.Type targetType, string paramName)
