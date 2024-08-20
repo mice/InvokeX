@@ -8,6 +8,8 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using XInspect;
 
+
+
 public class NativeTypeElementRegister : ITypeElementRegister
 {
     public static NativeTypeElementRegister Instance { get; private set; } = new NativeTypeElementRegister();
@@ -24,6 +26,8 @@ public class NativeTypeElementRegister : ITypeElementRegister
         RegisterType(typeof(ulong), ULongRenderer);
         RegisterType(typeof(float), FloatRenderer);
         RegisterType(typeof(double), DoubleRenderer);
+
+
         RegisterType(typeof(bool), BoolRenderer);
         RegisterType(typeof(string), StringRenderer);
 
@@ -37,6 +41,7 @@ public class NativeTypeElementRegister : ITypeElementRegister
         RegisterType(typeof(UnityEngine.RectInt), RectIntRenderer);
 
         RegisterType(typeof(System.Array), ArrayRenderer);
+        RegisterType(typeof(System.Enum), EnumRenderer);
         RegisterType(typeof(System.Collections.Generic.List<>), ListRenderer);
         RegisterType(typeof(UnityEngine.Object), UObjectRenderer);
         RegisterType(typeof(IParamData), IParamDataRenderer);
@@ -402,124 +407,37 @@ public class NativeTypeElementRegister : ITypeElementRegister
         return renderer;
     }
 
-    public static TypeElementRenderer ArrayRenderer(System.Type targetType, string paramName)
+    public static TypeElementRenderer EnumRenderer(System.Type targetType, string paramName)
     {
         var renderer = new TypeElementRenderer();
-        renderer.type = typeof(System.Array);
-        var foldout = new Foldout();
-        foldout.text = paramName;
-        var subType = targetType.GetElementType();
-        var list = new List<TypeElementRenderer>();
-
-        var sizeElement = factory.GetRender(typeof(int), "Size");
-        var sizeElementView = (IntXField)sizeElement.element;
-        //同样的pattern
-        sizeElementView.RegisterValueChangedCallback(t => {
-            if (int.TryParse(t.newValue, out var newValue))
-            {
-
-            }
-            var newCount = newValue + 1;
-            var oldCount = foldout.childCount;
-            if (newCount > oldCount)
-            {
-                for (int i = oldCount; i < newCount; i++)
-                {
-                    var typeRender = factory.GetRender(subType, "Element" + (i));
-                    list.Add(typeRender);
-                    foldout.Add(typeRender.element);
-                }
-            }
-            else
-            {
-                while (foldout.childCount > newCount)
-                {
-                    foldout.RemoveAt(foldout.childCount - 1);
-                    list.RemoveAt(list.Count - 1);
-                }
-            }
-        });
-
-        //reactive;
-        foldout.Add(sizeElement.element);
-        foldout.userData = list;
-        renderer.element = foldout;
+        renderer.type = targetType;
+        var values = Enum.GetValues(targetType);
+        var fieldView = new EnumField(paramName, values.GetValue(0) as Enum);
+      
+        renderer.element = fieldView;
         renderer.ToValueFunc = (r) =>
         {
-            var newSize = int.Parse(sizeElementView.value);
-            var obj = Array.CreateInstance(subType, newSize);
-            for (int i = 0; i < list.Count; i++)
-            {
-                obj.SetValue(list[i].ToValueFunc(list[i]), i);
-            }
-            return obj;
+            return fieldView.value;
         };
 
         renderer.SetValueAction = (obj) =>
         {
-            throw new NotImplementedException();
+            fieldView.value = (Enum)obj;
         };
+        return renderer;
+    }
 
+    public static TypeElementRenderer ArrayRenderer(System.Type targetType, string paramName)
+    {
+        var renderer = new ListElementRenderer();
+        renderer.InitArray(targetType,paramName,factory);
         return renderer;
     }
 
     public static TypeElementRenderer ListRenderer(System.Type targetType, string paramName)
     {
-        var renderer = new TypeElementRenderer();
-        renderer.type = typeof(System.Collections.Generic.List<>);
-        var foldout = new Foldout();
-        foldout.text = paramName;
-        var subType = targetType.GetGenericArguments()[0];
-        var list = new List<TypeElementRenderer>();
-
-        var sizeElement = factory.GetRender(typeof(int), "Size");
-        var sizeElementView = (IntXField)sizeElement.element;
-        sizeElementView.RegisterValueChangedCallback(t => {
-            if (int.TryParse(t.newValue, out var newValue))
-            {
-
-            }
-            var newCount = newValue + 1;
-            var oldCount = foldout.childCount;
-            if (newCount > oldCount)
-            {
-                for (int i = oldCount; i < newCount; i++)
-                {
-                    var typeRender = factory.GetRender(subType, "Element" + (i));
-                    list.Add(typeRender);
-                    foldout.Add(typeRender.element);
-                }
-            }
-            else
-            {
-                while (foldout.childCount > newCount)
-                {
-                    foldout.RemoveAt(foldout.childCount - 1);
-                    list.RemoveAt(list.Count - 1);
-                }
-            }
-        });
-
-        //reactive;
-        foldout.Add(sizeElement.element);
-        foldout.userData = list;
-        renderer.element = foldout;
-        renderer.ToValueFunc = (r) =>
-        {
-            var obj = System.Activator.CreateInstance(targetType) as System.Collections.IList;
-            for (int i = 0; i < list.Count; i++)
-            {
-                obj.Add(list[i].ToValueFunc(list[i]));
-            }
-            return obj;
-        };
-
-
-        renderer.SetValueAction = (obj) =>
-        {
-            throw new NotImplementedException();
-        };
-
+        var renderer = new ListElementRenderer();
+        renderer.InitList(targetType, paramName, factory);
         return renderer;
     }
 
@@ -547,7 +465,8 @@ public class NativeTypeElementRegister : ITypeElementRegister
         renderer.type = typeof(IParamData);
         var foldout = new Foldout();
         foldout.text = paramName;
-        var list = new List<TypeElementRenderer>();
+        var container = new ParamRendererContainer();
+      
         var fields = targetType.GetFields(BindingFlags.Instance | BindingFlags.Public);
         foreach (var item in fields)
         {
@@ -558,10 +477,10 @@ public class NativeTypeElementRegister : ITypeElementRegister
             {
                 foldout.Add(fRenderer.element);
             }
-            list.Add(fRenderer);
+            container.list.Add(fRenderer);
         }
 
-        foldout.userData = list;
+        foldout.userData = container;
         renderer.element = foldout;
         renderer.ToValueFunc = (r) =>
         {
@@ -569,7 +488,7 @@ public class NativeTypeElementRegister : ITypeElementRegister
             for (int i = 0; i < fields.Length; i++)
             {
                 var field = fields[i];
-                var tmpValue = list[i].ToValueFunc(list[i]);
+                var tmpValue = container.list[i].ToValueFunc(container.list[i]);
                 field.SetValue(obj, tmpValue);
             }
             return obj;
@@ -577,7 +496,12 @@ public class NativeTypeElementRegister : ITypeElementRegister
 
         renderer.SetValueAction = (obj) =>
         {
-            throw new NotImplementedException();
+            for (int i = 0; i < fields.Length; i++)
+            {
+                var field = fields[i];
+                var tmpValue = container.list[i].ToValueFunc(container.list[i]);
+                field.SetValue(obj, tmpValue);
+            }
         };
 
         return renderer;

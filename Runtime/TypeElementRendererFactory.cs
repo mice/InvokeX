@@ -26,6 +26,16 @@ public class TypeElementRendererFactory:ITypeElementRendererFactory
             return creator.Invoke(type, label);
         }
 
+        if (type.IsEnum)
+        {
+            var mapType = typeof(System.Enum);
+            if (creatorDict.TryGetValue(mapType, out var creator2))
+            {
+                return creator2.Invoke(type, label);
+
+            }
+        }
+
         if (type.IsArray)
         {
             var subType = type.GetElementType();

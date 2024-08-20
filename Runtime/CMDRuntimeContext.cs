@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine.UIElements;
 
 public class CMDRuntimeContext
@@ -10,6 +11,7 @@ public class CMDRuntimeContext
     private Dictionary<string, IMethodRepository> DelegationDict = new Dictionary<string, IMethodRepository>();
     private List<ITypeElementRegister> typeElementRegisters = new List<ITypeElementRegister>();
     private Dictionary<Type, IMethodRender> methodRenderDict = new Dictionary<Type, IMethodRender>();
+    private Dictionary<Type, FieldInfo[]> typeFieldDict = new Dictionary<Type, FieldInfo[]>();
     public TypeElementRendererFactory Factory { get; private set; }
     public static CMDRuntimeContext Instance
     {
@@ -79,6 +81,71 @@ public class CMDRuntimeContext
         {
             invoker.Invoke(method, param);
         }
+    }
+
+    private FieldInfo[] GetOrCreate(Type type)
+    {
+        if(!typeFieldDict.TryGetValue(type,out var fields))
+        {
+             fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public);
+            typeFieldDict.Add(type, fields);
+        }
+
+        return fields;
+    }
+
+    //绘制复炸的对象.
+    public void RenderType(ScrollView selectItemViews, object target)
+    {
+        selectItemViews.Clear();
+        if (target ==null)
+        {
+            selectItemViews.userData = null;
+            return;
+        }
+        var button = new Button();
+        button.text = "Save";
+       
+        selectItemViews.Add(button);
+        var container = new ParamRendererContainer();
+        var tmpType = target.GetType();
+        container.MethodName = target.GetType().Name;
+        var fields = GetOrCreate(tmpType);
+        var factory = Factory;
+        for (int i = 0; i < fields.Length; i++)
+        {
+            var info = fields[i];
+            var renderer = factory.GetRender(info.FieldType, info.Name);
+            if (renderer != null)
+            {
+                try
+                {
+                    renderer.SetValueAction?.Invoke(info.GetValue(target));
+                }
+                catch (Exception ex)
+                {
+                    UnityEngine.Debug.LogError($"Not OK:info:{info},:fieldName:{info.Name}:{ex}");
+                }
+               
+                selectItemViews.Add(renderer.element);
+            }
+            else
+            {
+                UnityEngine.Debug.LogError($"No Render Found:{info.FieldType}:name:{info.Name}");
+            }
+            container.list.Add(renderer);
+        }
+
+        button.clicked += () =>
+        {
+            for (int i = 0; i < fields.Length; i++)
+            {
+                var info = fields[i];
+                var renderer = container.list[i];
+                info.SetValue(target, renderer.ToValueFunc(renderer));
+            }
+        };
+        selectItemViews.userData = container;
     }
 
     public void RenderMethod(ScrollView selectItemViews, IMethodInfoData method)

@@ -10,6 +10,12 @@ public class RuntimeCallManager:IMethodInvoker, IMethodRepository
     internal class RuntimeMethodTable
     {
         public Dictionary<string, MethodBase> dict = new Dictionary<string, MethodBase>();
+        private HashSet<Type> types = new HashSet<Type>();
+
+        public void RegisterType(Type type)
+        {
+            types.Add(type);
+        }
 
         public static RuntimeMethodTable FromStatic(Type type)
         {
@@ -225,6 +231,24 @@ public class RuntimeCallManager:IMethodInvoker, IMethodRepository
 
     public TypeElementRenderer UnHandleType(System.Type type, Dictionary<Type, System.Func<System.Type, string, TypeElementRenderer>> creatorDict, string label)
     {
+        if (type.IsPrimitive)
+        {
+            return null;
+        }
+
+        if (type.IsInterface)
+        {
+            return null;
+        }
+
+        if (type.IsSerializable)
+        {
+            var mapType = typeof(IParamData);
+            if(creatorDict.TryGetValue(mapType, out var result))
+            {
+                return result.Invoke(type,label);
+            }
+        }
         return null;
     }
 }

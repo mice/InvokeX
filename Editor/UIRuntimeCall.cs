@@ -293,7 +293,7 @@ public class UIRuntimeCallV : EditorWindow
     }
 
     private void OnClickCollectMethoed(string sub, IMethodInfoData target )
-    {  //string methoed,int[] intParams
+    {
         try
         {
             var scrollView = rootVisualElement.Q<ScrollView>("typeContainer");
