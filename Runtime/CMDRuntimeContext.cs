@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 public class CMDRuntimeContext
@@ -103,49 +104,27 @@ public class CMDRuntimeContext
             selectItemViews.userData = null;
             return;
         }
+        var factory = Factory;
         var button = new Button();
         button.text = "Save";
        
         selectItemViews.Add(button);
-        var container = new ParamRendererContainer();
-        var tmpType = target.GetType();
-        container.MethodName = target.GetType().Name;
-        var fields = GetOrCreate(tmpType);
-        var factory = Factory;
-        for (int i = 0; i < fields.Length; i++)
+        var targetType = target.GetType();
+        var render = factory.GetRender(targetType, targetType.Name);
+        selectItemViews.Add(render.element);
+        try
         {
-            var info = fields[i];
-            var renderer = factory.GetRender(info.FieldType, info.Name);
-            if (renderer != null)
-            {
-                try
-                {
-                    renderer.SetValueAction?.Invoke(info.GetValue(target));
-                }
-                catch (Exception ex)
-                {
-                    UnityEngine.Debug.LogError($"Not OK:info:{info},:fieldName:{info.Name}:{ex}");
-                }
-               
-                selectItemViews.Add(renderer.element);
-            }
-            else
-            {
-                UnityEngine.Debug.LogError($"No Render Found:{info.FieldType}:name:{info.Name}");
-            }
-            container.list.Add(renderer);
+            render.SetValueAction(target);
         }
-
+        catch (Exception ex)
+        {
+            UnityEngine.Debug.LogError($"ex:{ex}");
+        }
+       
         button.clicked += () =>
         {
-            for (int i = 0; i < fields.Length; i++)
-            {
-                var info = fields[i];
-                var renderer = container.list[i];
-                info.SetValue(target, renderer.ToValueFunc(renderer));
-            }
+            render.SaveValueAction(target);
         };
-        selectItemViews.userData = container;
     }
 
     public void RenderMethod(ScrollView selectItemViews, IMethodInfoData method)

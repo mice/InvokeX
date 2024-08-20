@@ -1,14 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System.Collections.Generic;
 using UnityEngine.UIElements;
 using XInspect;
 using System;
 
 public class ListElementRenderer : TypeElementRenderer
 {
-    Foldout foldout;
-    ParamRendererContainer container;
+    private Foldout foldout;
+    private ParamRendererContainer container;
 
     public ListElementRenderer()
     {
@@ -21,6 +19,7 @@ public class ListElementRenderer : TypeElementRenderer
     public void InitArray(System.Type targetType,string paramName,ITypeElementRendererFactory factory)
     {
         type = typeof(System.Array);
+        expliciteType = targetType;
         foldout.text = paramName;
         var subType = targetType.GetElementType();
 
@@ -40,13 +39,21 @@ public class ListElementRenderer : TypeElementRenderer
 
         SetValueAction = (obj) =>
         {
-            UnityEngine.Debug.LogError($"TODO:::SetValue:{obj}");
+            if(obj is Array array)
+            {
+                for (int i = 0; i < list.Count; i++)
+                {
+                    list[i].SetValueAction(array.GetValue(i));
+                }
+            }
+           
         };
     }
 
     public void InitList(System.Type targetType, string paramName, ITypeElementRendererFactory factory)
     {
         type = typeof(System.Collections.Generic.List<>);
+        expliciteType = (System.Type)targetType;
         foldout.text = paramName;
         var subType = targetType.GetGenericArguments()[0];
         var list = container.list;
@@ -65,7 +72,13 @@ public class ListElementRenderer : TypeElementRenderer
 
         SetValueAction = (obj) =>
         {
-            UnityEngine.Debug.LogError($"TODO:::SetValue:{obj}");
+            if (obj is System.Collections.IList array)
+            {
+                for (int i = 0; i < list.Count; i++)
+                {
+                    list[i].SetValueAction(array[i]);
+                }
+            }
         };
 
     }

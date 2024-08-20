@@ -8,4 +8,5 @@ public partial class TypeElementRenderer
     public VisualElement element;
     public System.Func<TypeElementRenderer, System.Object> ToValueFunc;//method类型可以返回object,但是object类型,需要的是override对应的属性.
     public System.Action<System.Object> SetValueAction;
+    public System.Action<System.Object> SaveValueAction;
 }

@@ -461,49 +461,8 @@ public class NativeTypeElementRegister : ITypeElementRegister
 
     public static TypeElementRenderer IParamDataRenderer(System.Type targetType, string paramName)
     {
-        var renderer = new TypeElementRenderer();
-        renderer.type = typeof(IParamData);
-        var foldout = new Foldout();
-        foldout.text = paramName;
-        var container = new ParamRendererContainer();
-      
-        var fields = targetType.GetFields(BindingFlags.Instance | BindingFlags.Public);
-        foreach (var item in fields)
-        {
-            var paramAttr = item.GetCustomAttribute<ParamAttribute>();
-            // 没有handle paramAttr;
-            var fRenderer = factory.GetRender(item.FieldType, item.Name);
-            if (fRenderer != null)
-            {
-                foldout.Add(fRenderer.element);
-            }
-            container.list.Add(fRenderer);
-        }
-
-        foldout.userData = container;
-        renderer.element = foldout;
-        renderer.ToValueFunc = (r) =>
-        {
-            var obj = System.Activator.CreateInstance(targetType);
-            for (int i = 0; i < fields.Length; i++)
-            {
-                var field = fields[i];
-                var tmpValue = container.list[i].ToValueFunc(container.list[i]);
-                field.SetValue(obj, tmpValue);
-            }
-            return obj;
-        };
-
-        renderer.SetValueAction = (obj) =>
-        {
-            for (int i = 0; i < fields.Length; i++)
-            {
-                var field = fields[i];
-                var tmpValue = container.list[i].ToValueFunc(container.list[i]);
-                field.SetValue(obj, tmpValue);
-            }
-        };
-
+        var renderer = new SerializeElementRenderer();
+        renderer.InitObject(targetType, paramName, factory);
         return renderer;
     }
 
