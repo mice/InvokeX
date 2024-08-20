@@ -23,8 +23,8 @@ public class SerializeElementRenderer : TypeElementRenderer
     {
         this.type = typeof(IParamData);
         this.expliciteType = targetType;
-        
-        var fields = targetType.GetFields(BindingFlags.Instance | BindingFlags.Public);
+
+        var fields = CMDRuntimeContext.Instance.GetOrCreateFields(targetType);
         foreach (var item in fields)
         {
             var paramAttr = item.GetCustomAttribute<ParamAttribute>();

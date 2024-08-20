@@ -84,7 +84,7 @@ public class CMDRuntimeContext
         }
     }
 
-    private FieldInfo[] GetOrCreate(Type type)
+    public FieldInfo[] GetOrCreateFields(Type type)
     {
         if(!typeFieldDict.TryGetValue(type,out var fields))
         {
