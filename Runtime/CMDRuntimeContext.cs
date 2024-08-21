@@ -96,21 +96,24 @@ public class CMDRuntimeContext
     }
 
     //绘制复炸的对象.
-    public void RenderType(ScrollView selectItemViews, object target)
+    /// <summary>
+    /// 职责有点不恰当.click不应该在这里.
+    /// </summary>
+    /// <param name="selectItemViews"></param>
+    /// <param name="target"></param>
+    public bool TryRenderType(ScrollView selectItemViews, object target,out TypeElementRenderer render)
     {
         selectItemViews.Clear();
         if (target ==null)
         {
             selectItemViews.userData = null;
-            return;
+            render = null;
+            return false;
         }
         var factory = Factory;
-        var button = new Button();
-        button.text = "Save";
-       
-        selectItemViews.Add(button);
+      
         var targetType = target.GetType();
-        var render = factory.GetRender(targetType, targetType.Name);
+        render = factory.GetRender(targetType, targetType.Name);
         selectItemViews.Add(render.element);
         try
         {
@@ -120,11 +123,7 @@ public class CMDRuntimeContext
         {
             UnityEngine.Debug.LogError($"ex:{ex}");
         }
-       
-        button.clicked += () =>
-        {
-            render.SaveValueAction(target);
-        };
+        return true;
     }
 
     public void RenderMethod(ScrollView selectItemViews, IMethodInfoData method)
